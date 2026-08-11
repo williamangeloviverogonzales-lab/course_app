@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academic Course Portal</title>
+  <link rel="stylesheet" href="/static/glass.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg-main, #f0f4f8);
+      color: var(--text-main, #1e293b);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .portal-container {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 60px);
+      overflow: hidden;
+    }
+    .sidebar {
+      width: 320px;
+      border-right: 1px solid var(--glass-border, rgba(0,0,0,0.1));
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+    }
+    .main-content {
+      flex: 1;
+      height: 100%;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    header {
+      height: 60px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--glass-border, rgba(0,0,0,0.1));
+    }
+    .topic-item {
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .topic-item:hover {
+      background: rgba(99, 102, 241, 0.08);
+    }
+    .topic-item.active {
+      border-color: var(--accent, #6366f1);
+      background: rgba(99, 102, 241, 0.12);
+      font-weight: 600;
+    }
+    .topic-item.locked {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    /* Auth Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .auth-card {
+      padding: 32px;
+      width: 100%;
+      max-width: 400px;
+      border-radius: 16px;
+      background: var(--glass-bg, #ffffff);
+      border: 1px solid var(--glass-border, rgba(0,0,0,0.1));
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    .auth-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+    .auth-input, .auth-select {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--glass-border, #cbd5e1);
+      background: var(--glass-bg, #ffffff);
+      color: var(--text-main, #1e293b);
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .auth-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--accent, #6366f1);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- AUTHENTICATION MODAL GATE -->
+  <div class="modal-overlay" id="authModal">
+    <div class="auth-card">
+      <h2 style="margin-top: 0; color: var(--accent, #6366f1); text-align: center;">Course Portal Access</h2>
+      <p style="font-size: 0.88rem; color: var(--text-muted, #64748b); text-align: center; margin-bottom: 24px;">
+        Please select your course and enter your Student Number to log in.
+      </p>
+
+      <div class="auth-field">
+        <label style="font-size: 0.85rem; font-weight: 600;">Course / Subject:</label>
+        <select id="modalSubjectSelect" class="auth-select">
+          <option value="PROB101">Probability (PROB101)</option>
+          <option value="STAT101">Applied Statistics (STAT101)</option>
+        </select>
+      </div>
+
+      <div class="auth-field">
+        <label style="font-size: 0.85rem; font-weight: 600;">Student Number:</label>
+        <input type="text" id="studentIdInput" class="auth-input" placeholder="e.g., 2024-001" onkeydown="if(event.key==='Enter') handleLogin()">
+      </div>
+
+      <button class="auth-btn" onclick="handleLogin()">Access Course →</button>
+      
+      <div id="authError" style="color: #dc2626; font-size: 0.88rem; display: none; text-align: center; margin-top: 12px; font-weight: 600;"></div>
+    </div>
+  </div>
+
+  <!-- PORTAL INTERFACE -->
+  <header>
+    <div style="font-weight: 700; font-size: 1.1rem;">🎓 Academic Course Portal</div>
+    <div id="userInfo" style="font-size: 0.9rem; font-weight: 600;">Not Logged In</div>
+  </header>
+
+  <div class="portal-container">
+    <aside class="sidebar">
+      <label style="font-size: 0.85rem; font-weight: 600;">Active Course:</label>
+      <select id="sectionSelect" class="auth-select" onchange="switchCourse(this.value)">
+        <option value="PROB101">Probability (PROB101)</option>
+        <option value="STAT101">Applied Statistics (STAT101)</option>
+      </select>
+      <hr style="width: 100%; border: 0; border-top: 1px solid var(--glass-border); margin: 8px 0;">
+      <div id="topicsList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+    </aside>
+
+    <main class="main-content">
+      <iframe id="lessonFrame" src="about:blank"></iframe>
+    </main>
+  </div>
+
+<script>
+  let currentStudentId = "";
+  let currentStudentName = "";
+
+  async function handleLogin() {
+    const subjectCode = document.getElementById('modalSubjectSelect').value;
+    const studentId = document.getElementById('studentIdInput').value.trim();
+    const errorEl = document.getElementById('authError');
+
+    if (!studentId) {
+      errorEl.innerText = "Please enter your Student Number.";
+      errorEl.style.display = "block";
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/verify-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ student_id: studentId, subject_code: subjectCode })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        currentStudentId = studentId;
+        currentStudentName = data.student_name;
+        document.getElementById('authModal').style.display = 'none';
+        document.getElementById('userInfo').innerText = `👤 ${data.student_name} (${studentId})`;
+        document.getElementById('sectionSelect').value = subjectCode;
+        loadSyllabus(subjectCode);
+      } else {
+        errorEl.innerText = data.detail || "Access verification failed.";
+        errorEl.style.display = "block";
+      }
+    } catch (err) {
+      errorEl.innerText = "Connection error. Please try again.";
+      errorEl.style.display = "block";
+    }
+  }
+
+  async function switchCourse(subjectCode) {
+    if (!currentStudentId) return;
+
+    try {
+      const response = await fetch('/api/verify-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ student_id: currentStudentId, subject_code: subjectCode })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        loadSyllabus(subjectCode);
+      } else {
+        alert(data.detail || `You are not enrolled in ${subjectCode}.`);
+        document.getElementById('sectionSelect').value = document.getElementById('modalSubjectSelect').value;
+      }
+    } catch (err) {
+      alert("Error switching course.");
+    }
+  }
+
+  async function loadSyllabus(subjectCode) {
+    const response = await fetch(`/api/subjects/${subjectCode}/topics`);
+    const topics = await response.json();
+
+    const topicsList = document.getElementById('topicsList');
+    topicsList.innerHTML = '';
+
+    let firstLessonPath = null;
+
+    topics.forEach((topic) => {
+      const item = document.createElement('div');
+      item.className = `topic-item ${topic.status === 'locked' ? 'locked' : ''}`;
+      item.innerText = topic.topic_title;
+
+      if (topic.status !== 'locked' && topic.lesson_file_path) {
+        if (!firstLessonPath) firstLessonPath = topic.lesson_file_path;
+
+        item.onclick = () => {
+          document.querySelectorAll('.topic-item').forEach(el => el.classList.remove('active'));
+          item.classList.add('active');
+          loadLessonWithWatermark(topic.lesson_file_path);
+        };
+      }
+
+      topicsList.appendChild(item);
+    });
+
+    if (firstLessonPath) {
+      const firstItem = topicsList.querySelector('.topic-item:not(.locked)');
+      if (firstItem) firstItem.classList.add('active');
+      loadLessonWithWatermark(firstLessonPath);
+    }
+  }
+
+  function loadLessonWithWatermark(filePath) {
+    const iframe = document.getElementById('lessonFrame');
+    // Append unique timestamp to bypass browser iframe caching
+    iframe.src = '/' + filePath + '?t=' + new Date().getTime();
+
+    iframe.onload = () => {
+      applyWatermarkToIframe(iframe, `${currentStudentName} • ${currentStudentId}`);
+    };
+  }
+
+  function applyWatermarkToIframe(iframe, text) {
+    try {
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+      if (!iframeDoc || !iframeDoc.body) return;
+
+      const existing = iframeDoc.getElementById('dynamicWatermarkOverlay');
+      if (existing) existing.remove();
+
+      const watermarkDiv = iframeDoc.createElement('div');
+      watermarkDiv.id = 'dynamicWatermarkOverlay';
+      watermarkDiv.style.cssText = `
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        pointer-events: none !important;
+        z-index: 99999 !important;
+      `;
+
+      const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="180">
+        <text x="50%" y="50%" fill="rgba(0, 0, 0, 0.015)" font-size="15" font-family="sans-serif" font-weight="bold" text-anchor="middle" transform="rotate(-25 150 90)">${text}</text>
+      </svg>`;
+
+      const svgUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString)}`;
+      watermarkDiv.style.backgroundImage = `url("${svgUrl}")`;
+      watermarkDiv.style.backgroundRepeat = 'repeat';
+
+      iframeDoc.body.appendChild(watermarkDiv);
+    } catch (err) {
+      console.warn("Could not apply watermark inside iframe:", err);
+    }
+  }
+</script>
+</body>
+</html>
