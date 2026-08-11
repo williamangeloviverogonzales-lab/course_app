@@ -169,7 +169,7 @@
       <p style="margin: 0; font-size: 0.92rem;">You roll <strong>a pair of 6-sided dice</strong> up to 24 times. You win if you get a <strong>double-6 (6 and 6 simultaneously)</strong> on any of your 24 turns. You lose if you complete 24 rolls without ever seeing a double-6.</p>
     </div>
 
-    <p style="font-size: 0.9rem; color: var(--text-muted);"><em>Why 24 rolls? Notice that getting a single 6 has a 1 in 6 chance ($1/6$), and 4 rolls gives $4 \times (1/6) = 2/3$ proportional odds. Meanwhile, a double-6 has a 1 in 36 chance ($1/36$), and 24 rolls gives $24 \times (1/36) = 2/3$ proportional odds! They seem mathematically equivalent... right?</em></p>
+    <p style="font-size: 0.9rem; color: var(--text-muted);"><em>Why 24 rolls? Notice that getting a single 6 has a 1 in 6 chance $(1/6)$, and 4 rolls gives $4 \times (1/6) = 2/3$ proportional odds. Meanwhile, a double-6 has a 1 in 36 chance $(1/36)$, and 24 rolls gives $24 \times (1/36) = 2/3$ proportional odds! They seem mathematically equivalent... right?</em></p>
 
     <div class="question-card">
       <div class="question-prompt">
@@ -194,7 +194,7 @@
 
   <!-- CHUNK 1: Historical Context & Core Foundations -->
   <div class="chunk glass-panel" id="chunk-1">
-    <h2>2. Historical Context & Formal Foundations</h2>
+    <h2>2. Historical Context </h2>
     <p>In 1654, a French nobleman and passionate gambler named <strong>Chevalier de Méré</strong> faced this exact decision! He was losing a fortune on dice bets and wrote in desperation to mathematician <strong>Blaise Pascal</strong>. Pascal and Pierre de Fermat realized that to solve de Méré's puzzle, one must establish precise mathematical definitions for probability.</p>
 
     <div class="concept-box">
@@ -279,7 +279,7 @@
 
   <!-- CHUNK 3: Quality Control Example & Game A Simulator -->
   <div class="chunk glass-panel" id="chunk-3">
-    <h2>4. Application & Game A Simulator</h2>
+    <h2>4. Game A Simulator</h2>
     <p>Let's examine how sample spaces and events apply to quality control inspection before simulating Game A.</p>
 
     <!-- Game A Simulator (Aligned with Event E) -->
@@ -296,7 +296,7 @@
 
     <div class="question-card">
       <div class="question-prompt">
-        <strong>Context:</strong> A quality control engineer inspects a batch of microchips coming off an assembly line. Each tested chip is classified as either <strong>Functional ($F$)</strong> or <strong>Defective ($D$)</strong>.
+        <strong>Try this:</strong> A quality control engineer inspects a batch of microchips coming off an assembly line. Each tested chip is classified as either <strong>Functional ($F$)</strong> or <strong>Defective ($D$)</strong>.
         <br><br>
         When inspecting a pair of microchips in sequence, the sample space of possible outcomes is:
         $$S = \{FF, FD, DF, DD\}$$
@@ -316,7 +316,7 @@
 
   <!-- CHUNK 4: Combining Events -->
   <div class="chunk glass-panel" id="chunk-4">
-    <h2>5. Combining Events (Set Logic)</h2>
+    <h2>5. Combining Events </h2>
     <p>Real-world algorithms combine simple events using set operations:</p>
     <ul>
       <li><strong>Union ($A \cup B$):</strong> $A$ OR $B$ occurs.</li>
@@ -342,8 +342,8 @@
 
   <!-- CHUNK 5: Mutually Exclusive Events -->
   <div class="chunk glass-panel" id="chunk-5">
-    <h2>6. Mutually Exclusive (Disjoint) Events</h2>
-    <p>Two events $A$ and $B$ are **mutually exclusive** if they cannot occur at the same instant.</p>
+    <h2>6. Mutually Exclusive Events (Disjoint Events) </h2>
+    <p>Two events $A$ and $B$ are mutually exclusive if they cannot occur at the same instant.</p>
 
     <div class="concept-box">
       <strong>Formal Rule:</strong> $A \cap B = \emptyset \quad (\text{Empty Set})$
@@ -390,7 +390,7 @@
 
   <!-- CHUNK 7: Bounding Probabilities (0 to 1) -->
   <div class="chunk glass-panel" id="chunk-7">
-    <h2>8. Bounding Probabilities: The Absolute Boundaries</h2>
+    <h2>8. Probability Boundaries</h2>
     <p>Combining Kolmogorov's Axioms gives us one of the most fundamental theorems in probability theory: every event $E$ must exist within fixed boundary limits.</p>
 
     <div class="concept-box">
