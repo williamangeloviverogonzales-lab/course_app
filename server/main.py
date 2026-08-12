@@ -138,27 +138,27 @@ def seed_default_courses():
                 )
                 session.add(topic)
 
-        # --- 4. PHYSICS FOR INDUSTRIAL TECHNOLOGISTS (BIT02) ---
-        bit02_subject = session.exec(select(Subject).where(Subject.subject_code == "BIT02")).first()
-        if not bit02_subject:
-            bit02_subject = Subject(
-                subject_code="BIT02", 
+        # --- 4. PHYSICS FOR INDUSTRIAL TECHNOLOGISTS (BIT04) ---
+        bit04_subject = session.exec(select(Subject).where(Subject.subject_code == "BIT04")).first()
+        if not bit04_subject:
+            bit04_subject = Subject(
+                subject_code="BIT04", 
                 title="Physics for Industrial Technologists", 
                 description="Applied Physics Principles for Industrial Technology"
             )
-            session.add(bit02_subject)
+            session.add(bit04_subject)
             session.commit()
 
-        bit02_topics = [
-            ("Topic 1: Applied Mechanics & Kinematics", "published", "lessons/BIT02/topic-01-mechanics.html"),
+        bit04_topics = [
+            ("Topic 1: Applied Mechanics & Kinematics", "published", "lessons/BIT04/topic-01-mechanics.html"),
             ("Topic 2: Work, Energy & Power in Industrial Systems", "locked", None),
             ("Topic 3: Thermodynamics & Heat Transfer", "locked", None),
             ("Topic 4: Fluid Mechanics & Pneumatics", "locked", None),
         ]
 
-        for idx, (title, status_flag, file_path) in enumerate(bit02_topics, start=1):
+        for idx, (title, status_flag, file_path) in enumerate(bit04_topics, start=1):
             existing_topic = session.exec(
-                select(Topic).where(Topic.subject_code == "BIT02", Topic.topic_number == idx)
+                select(Topic).where(Topic.subject_code == "BIT04", Topic.topic_number == idx)
             ).first()
 
             if existing_topic:
@@ -168,7 +168,7 @@ def seed_default_courses():
                 session.add(existing_topic)
             else:
                 topic = Topic(
-                    subject_code="BIT02",
+                    subject_code="BIT04",
                     topic_number=idx,
                     topic_title=title,
                     status=status_flag,
