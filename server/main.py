@@ -33,9 +33,9 @@ def seed_default_courses():
             session.commit()
 
         prob_topics = [
-            ("Topic 1: Sample Spaces & Axioms of Probability", "published", "lessons/PROB101/topic-01-sample-spaces.html"),
-            ("Topic 2: Counting Rules, Permutations & Combinations", "published", "lessons/PROB101/topic-02-counting-rules.html"),
-            ("Topic 3: Conditional Probability & Bayes' Theorem", "locked", "lessons/PROB101/topic-03-conditional-prob.html"),
+            ("Topic 1: Sample Spaces & Axioms of Probability", "published", "lessons/MATH302/topic-01-sample-spaces.html"),
+            ("Topic 2: Counting Rules, Permutations & Combinations", "published", "lessons/MATH302/topic-02-counting-rules.html"),
+            ("Topic 3: Conditional Probability & Bayes' Theorem", "locked", "lessons/MATH302/topic-03-conditional-prob.html"),
             ("Topic 4: Discrete Random Variables & Expected Value", "locked", None),
             ("Topic 5: Common Discrete Distributions (Binomial, Poisson)", "locked", None),
             ("Topic 6: Continuous Random Variables & PDFs", "locked", None),
@@ -99,8 +99,6 @@ def seed_default_courses():
                 )
                 session.add(topic)
 
-        
-
         # --- 3. MATHEMATICAL ECONOMICS (RC4) ---
         rc4_subject = session.exec(select(Subject).where(Subject.subject_code == "RC4")).first()
         if not rc4_subject:
@@ -113,20 +111,12 @@ def seed_default_courses():
             session.commit()
 
         rc4_topics = [
-    (
-        "Topic 1: Nature of Mathematical Economics", 
-        "published", 
-        "lessons/RC4/topic-01-nature-of-mathematical-economics.html"
-    ),
-    (
-        "Topic 2: Sets, Real Numbers, Relations & Functions", 
-        "published", 
-        "lessons/RC4/topic-02-foundations-and-functions.html"
-    ),
-    ("Topic 3: Comparative Static Analysis & Derivatives", "locked", None),
-    ("Topic 4: Optimization & Unconstrained Problems", "locked", None),
-    ("Topic 5: Constrained Optimization & Lagrange Multipliers", "locked", None),
-]
+            ("Topic 1: Nature of Mathematical Economics", "published", "lessons/RC4/topic-01-nature-of-mathematical-economics.html"),
+            ("Topic 2: Sets, Real Numbers, Relations & Functions", "published", "lessons/RC4/topic-02-foundations-and-functions.html"),
+            ("Topic 3: Comparative Static Analysis & Derivatives", "locked", None),
+            ("Topic 4: Optimization & Unconstrained Problems", "locked", None),
+            ("Topic 5: Constrained Optimization & Lagrange Multipliers", "locked", None),
+        ]
 
         for idx, (title, status_flag, file_path) in enumerate(rc4_topics, start=1):
             existing_topic = session.exec(
@@ -186,7 +176,7 @@ def seed_default_courses():
                 )
                 session.add(topic)
 
-                # --- 5. MATHEMATICS IN THE MODERN WORLD (GEC4) ---
+        # --- 5. MATHEMATICS IN THE MODERN WORLD (GEC4) ---
         gec4_subject = session.exec(select(Subject).where(Subject.subject_code == "GEC4")).first()
         if not gec4_subject:
             gec4_subject = Subject(
@@ -245,6 +235,11 @@ def sync_all_subject_rosters(lessons_dir: str):
 
 def process_subject_csv(session: Session, subject_code: str, csv_path: str):
     """Read student roster from a subject's roster.csv and enroll them in SQLModel DB."""
+    # Ensure subject exists before attempting section creation
+    subject = session.exec(select(Subject).where(Subject.subject_code == subject_code)).first()
+    if not subject:
+        return
+
     sec_id = f"SEC_{subject_code}_DEFAULT"
     
     section = session.exec(select(Section).where(Section.section_id == sec_id)).first()
