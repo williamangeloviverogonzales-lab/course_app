@@ -127,20 +127,30 @@
       <strong>Nonlinear Demand & Supply Model Example:</strong><br>
       Suppose a product's demand function $p = d(x)$ and supply function $p = s(x)$ are given by:
       $$p = d(x) = -0.01x^2 - 0.2x + 8 \quad \text{(Demand)}$$
-      $$p = s(x) = 0.01x^2 + 0.1x + 3 \quad \text{(Supply)}$$
-      where $p$ is price in dollars and $x$ is measured in units of a hundred.
+      $$p = s(x) = 0.01x^2 + 0.1x + c_s \quad \text{(Supply)}$$
+      where $p$ is price in dollars, $x$ is measured in units of a hundred, and $c_s$ is base autonomous supply cost.
     </div>
 
     <div class="lab-widget">
       <h3>Interactive Market Equilibrium Solver</h3>
-      <p>Calculate equilibrium quantity ($x^*$) and price ($p^*$) where $d(x) = s(x)$:</p>
-      <button class="lab-btn" onclick="solveModelEquilibrium()">Solve Equilibrium</button>
-      <div id="equilibriumResult" style="font-weight: 700; color: var(--accent);">Click button to calculate...</div>
+      <p>Adjust base autonomous supply cost ($c_s$) or base demand intercept ($a_d$) to observe how equilibrium quantity ($x^*$) and price ($p^*$) shift:</p>
+      
+      <div style="display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; align-items: center; margin-bottom: 10px;">
+        <label style="font-weight: 600;">Demand Base Intercept ($a_d$): 
+          <input type="number" id="demandIntercept" value="8" step="0.5" style="width: 65px; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--glass-border);">
+        </label>
+        <label style="font-weight: 600;">Supply Base Intercept ($c_s$): 
+          <input type="number" id="supplyIntercept" value="3" step="0.5" style="width: 65px; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--glass-border);">
+        </label>
+      </div>
+
+      <button class="lab-btn" onclick="solveModelEquilibrium()">Calculate Equilibrium</button>
+      <div id="equilibriumResult" style="font-weight: 700; color: var(--accent); margin-top: 8px;">Equilibrium x* = 10.00 (100s of units) | Price p* = $5.00</div>
     </div>
 
     <div class="question-card">
       <div class="question-prompt">
-        <strong>Quick Check:</strong> Setting $d(x) = s(x)$ yields $-0.01x^2 - 0.2x + 8 = 0.01x^2 + 0.1x + 3$. What is the simplified quadratic equation?
+        <strong>Quick Check:</strong> Setting $d(x) = s(x)$ for $a_d = 8$ and $c_s = 3$ yields $-0.01x^2 - 0.2x + 8 = 0.01x^2 + 0.1x + 3$. What is the simplified quadratic equation?
       </div>
       <div class="options-grid">
         <button class="option-card" onclick="submitOption(this, true, 'chunk-1', 'chunk-2')">$0.02x^2 + 0.3x - 5 = 0$</button>
@@ -482,12 +492,25 @@ print(f"z = f({x_val}, {y_val}) = {f_multivar(x_val, y_val)}")</pre>
   }
 
   function solveModelEquilibrium() {
-    // 0.02 x^2 + 0.3 x - 5 = 0
-    const a = 0.02, b = 0.3, c = -5;
-    const disc = Math.sqrt(b*b - 4*a*c);
-    const x = (-b + disc) / (2*a);
-    const p = -0.01*x*x - 0.2*x + 8;
-    document.getElementById('equilibriumResult').innerText = `Equilibrium x* = ${x.toFixed(2)} (100s of units) | Price p* = $${p.toFixed(2)}`;
+    const ad = parseFloat(document.getElementById('demandIntercept').value) || 8;
+    const cs = parseFloat(document.getElementById('supplyIntercept').value) || 3;
+    
+    // 0.02 x^2 + 0.3 x - (ad - cs) = 0
+    const a = 0.02;
+    const b = 0.3;
+    const c = -(ad - cs);
+
+    if (c >= 0) {
+      document.getElementById('equilibriumResult').innerText = "No positive real equilibrium exists with these parameters!";
+      return;
+    }
+
+    const disc = Math.sqrt(b * b - 4 * a * c);
+    const x = (-b + disc) / (2 * a);
+    const p = -0.01 * x * x - 0.2 * x + ad;
+
+    document.getElementById('equilibriumResult').innerText = 
+      `Equilibrium x* = ${x.toFixed(2)} (100s of units) | Price p* = $${p.toFixed(2)}`;
   }
 
   function calcSetOps() {
