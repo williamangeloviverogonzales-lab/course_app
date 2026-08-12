@@ -8,8 +8,8 @@ class Enrollment(SQLModel, table=True):
     section_id: str = Field(foreign_key="section.section_id", primary_key=True)
 
 class Subject(SQLModel, table=True):
-    subject_code: str = Field(primary_key=True)  # e.g. PROB101, STAT101
-    title: str                                    # e.g. "Probability & Statistics"
+    subject_code: str = Field(primary_key=True)  # e.g. MATH302, STAT101
+    title: str                                    # e.g. "Probability"
     description: Optional[str] = None
 
     sections: List["Section"] = Relationship(back_populates="subject")
