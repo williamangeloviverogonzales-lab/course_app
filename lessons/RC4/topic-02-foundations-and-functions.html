@@ -54,6 +54,7 @@
     .completion-banner { display: none; text-align: center; padding: 32px 20px; background: rgba(22, 163, 74, 0.12); border: 1px solid rgba(22, 163, 74, 0.3); border-radius: 16px; }
     .completion-banner.visible { display: block; }
     canvas { background: #ffffff; border-radius: 10px; border: 1px solid var(--glass-border); cursor: crosshair; }
+    .set-input { padding: 6px 10px; border-radius: 8px; border: 1px solid var(--glass-border); font-size: 0.9rem; width: 100%; max-width: 260px; background: var(--glass-bg); color: var(--text-main); }
   </style>
 </head>
 <body>
@@ -187,7 +188,7 @@
     </div>
   </div>
 
-  <!-- CHUNK 3: Set Theory & Operations -->
+  <!-- CHUNK 3: Set Theory & Operations with Interactive Inputs -->
   <div class="chunk glass-panel" id="chunk-3">
     <h2>4. Concept of Sets, Cardinality & Set Operations</h2>
     <p>A <strong>set</strong> is a well-defined collection of distinct objects. Order and repetition do not change the set: $\{c, a, t, a, n, d, u, a, n, e, s\} = \{c, a, t, n, d, u, e, s\}$.</p>
@@ -203,23 +204,27 @@
       </ul>
     </div>
 
-    <div class="concept-box" style="font-size: 0.92rem;">
-      <strong>Six Operations on Sets:</strong><br>
-      Given $U = \{1, 2, 3, 4, 5, 6, 7, 8, 9, 10\}$, $A = \{1, 3, 5, 6\}$, and $B = \{3, 6, 9\}$:
-      <ul>
-        <li><strong>Union ($A \cup B$):</strong> $\{1, 3, 5, 6, 9\}$</li>
-        <li><strong>Intersection ($A \cap B$):</strong> $\{3, 6\}$</li>
-        <li><strong>Difference ($A \setminus B$):</strong> $\{1, 5\}$</li>
-        <li><strong>Symmetric Difference ($A \Delta B$):</strong> $\{1, 5, 9\}$</li>
-        <li><strong>Complement ($A'$):</strong> $\{2, 4, 7, 8, 9, 10\}$</li>
-        <li><strong>Cartesian Product ($A \times B$):</strong> Set of ordered pairs $(a, b)$.</li>
-      </ul>
-    </div>
-
     <div class="lab-widget">
       <h3>Interactive Set Operations Calculator</h3>
-      <button class="lab-btn" onclick="calcSetOps()">Run Set Operations</button>
-      <div id="setOpsOutput" style="font-weight: 600; text-align: left; font-size: 0.88rem; width: 100%;">Click button to run...</div>
+      <p>Enter elements separated by commas for each set:</p>
+      
+      <div style="display: flex; flex-direction: column; gap: 10px; width: 100%; align-items: center; margin-bottom: 10px;">
+        <label style="font-weight: 600; font-size: 0.9rem;">Universal Set ($U$): 
+          <input type="text" id="setU" class="set-input" value="1, 2, 3, 4, 5, 6, 7, 8, 9, 10" placeholder="e.g. 1, 2, 3, 4, 5">
+        </label>
+        <label style="font-weight: 600; font-size: 0.9rem;">Set $A$: 
+          <input type="text" id="setA" class="set-input" value="1, 3, 5, 6" placeholder="e.g. 1, 3, 5">
+        </label>
+        <label style="font-weight: 600; font-size: 0.9rem;">Set $B$: 
+          <input type="text" id="setB" class="set-input" value="3, 6, 9" placeholder="e.g. 3, 6, 9">
+        </label>
+      </div>
+
+      <button class="lab-btn" onclick="calcSetOps()">Calculate Set Operations</button>
+      
+      <div id="setOpsOutput" style="font-weight: 600; text-align: left; font-size: 0.9rem; width: 100%; margin-top: 10px; line-height: 1.8;">
+        Click button to compute operations...
+      </div>
     </div>
 
     <div class="question-card">
@@ -468,25 +473,39 @@ print("A Difference B:", A - B)</pre>
       `Equilibrium x* = ${x.toFixed(2)} (100s of units) | Price p* = $${p.toFixed(2)}`;
   }
 
-  // Set Operations Calculator
+  // Dynamic Set Operations Calculator
+  function parseSetInput(str) {
+    if (!str || !str.trim()) return [];
+    return [...new Set(str.split(',').map(item => item.trim()).filter(item => item !== ''))];
+  }
+
   function calcSetOps() {
-    const U = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    const A = [1, 3, 5, 6];
-    const B = [3, 6, 9];
-    
-    const union = [...new Set([...A, ...B])].sort((a,b)=>a-b);
-    const intersect = A.filter(x => B.includes(x));
-    const diff = A.filter(x => !B.includes(x));
-    const symDiff = [...A.filter(x => !B.includes(x)), ...B.filter(x => !A.includes(x))].sort((a,b)=>a-b);
-    const compA = U.filter(x => !A.includes(x));
+    const rawU = parseSetInput(document.getElementById('setU').value);
+    const rawA = parseSetInput(document.getElementById('setA').value);
+    const rawB = parseSetInput(document.getElementById('setB').value);
+
+    // Helper to format set output
+    const formatSet = (arr) => arr.length > 0 ? `{${arr.join(', ')}}` : `∅ (Empty Set)`;
+
+    const union = [...new Set([...rawA, ...rawB])];
+    const intersect = rawA.filter(x => rawB.includes(x));
+    const diff = rawA.filter(x => !rawB.includes(x));
+    const symDiff = [...rawA.filter(x => !rawB.includes(x)), ...rawB.filter(x => !rawA.includes(x))];
+    const compA = rawU.filter(x => !rawA.includes(x));
 
     document.getElementById('setOpsOutput').innerHTML = `
-      • A ∪ B = {${union.join(', ')}}<br>
-      • A ∩ B = {${intersect.join(', ')}}<br>
-      • A \\ B = {${diff.join(', ')}}<br>
-      • A Δ B = {${symDiff.join(', ')}}<br>
-      • A' = {${compA.join(', ')}}
+      • <strong>Union ($A \\cup B$):</strong> ${formatSet(union)}<br>
+      • <strong>Intersection ($A \\cap B$):</strong> ${formatSet(intersect)}<br>
+      • <strong>Difference ($A \\setminus B$):</strong> ${formatSet(diff)}<br>
+      • <strong>Symmetric Difference ($A \\Delta B$):</strong> ${formatSet(symDiff)}<br>
+      • <strong>Complement ($A'$ relative to $U$):</strong> ${formatSet(compA)}
     `;
+
+    if (window.renderMathInElement) {
+      renderMathInElement(document.getElementById('setOpsOutput'), {
+        delimiters: [{left: '$', right: '$', display: false}]
+      });
+    }
   }
 
   // Cartesian Point Plotter Visualizer
@@ -586,8 +605,9 @@ print("A Difference B:", A - B)</pre>
     updateProgress();
   }
 
-  // Initial draw
+  // Initial setup
   drawCartesianGrid(2, -4);
+  calcSetOps();
   updateProgress();
 </script>
 </body>
