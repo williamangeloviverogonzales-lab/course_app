@@ -127,25 +127,27 @@
     <p>Consider a market model where demand $p = d(x)$ and supply $p = s(x)$ are given by quadratic functions:</p>
 
     <div class="concept-box">
-      $$p = d(x) = -0.01x^2 - 0.2x + a_d \quad \text{(Demand)}$$
-      $$p = s(x) = 0.01x^2 + 0.1x + c_s \quad \text{(Supply)}$$
-      where $p$ is price in dollars, $x$ is output in hundreds of units, $a_d$ is base demand intercept, and $c_s$ is base supply cost.
+      $$p = d(x) = -0.01x^2 - 0.2x + a_d \quad \text{(Demand Curve)}$$
+      $$p = s(x) = 0.01x^2 + 0.1x + c_s \quad \text{(Supply Curve)}$$
+      where $p$ is price in dollars, $x$ is output in hundreds of units, $a_d$ is the demand intercept, and $c_s$ is the base supply cost.
     </div>
 
     <div class="lab-widget">
-      <h3>Interactive Market Equilibrium Solver</h3>
-      <p>Adjust parameters to observe how equilibrium quantity ($x^*$) and price ($p^*$) change:</p>
+      <h3>Interactive Market Equilibrium & Graph Solver</h3>
+      <p>Adjust parameters to observe how the curves shift and intersect in Quadrant I ($\mathbb{R}^2_+$):</p>
       
       <div style="display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; align-items: center; margin-bottom: 10px;">
         <label style="font-weight: 600;">Demand Intercept ($a_d$): 
-          <input type="number" id="demandIntercept" value="8" step="0.5" style="width: 65px; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--glass-border);">
+          <input type="number" id="demandIntercept" value="8" step="0.5" style="width: 65px; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--glass-border);" oninput="solveModelEquilibrium()">
         </label>
         <label style="font-weight: 600;">Supply Intercept ($c_s$): 
-          <input type="number" id="supplyIntercept" value="3" step="0.5" style="width: 65px; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--glass-border);">
+          <input type="number" id="supplyIntercept" value="3" step="0.5" style="width: 65px; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--glass-border);" oninput="solveModelEquilibrium()">
         </label>
       </div>
 
-      <button class="lab-btn" onclick="solveModelEquilibrium()">Calculate Equilibrium</button>
+      <!-- Graph Canvas -->
+      <canvas id="marketCanvas" width="340" height="240" style="background: #ffffff; border-radius: 10px; border: 1px solid var(--glass-border);"></canvas>
+
       <div id="equilibriumResult" style="font-weight: 700; color: var(--accent); margin-top: 8px;">Equilibrium x* = 10.00 (100s of units) | Price p* = $5.00</div>
     </div>
 
@@ -455,24 +457,129 @@ print("A Difference B:", A - B)</pre>
     }
   }
 
-  // Market Model Equilibrium Solver
+  // Market Model Equilibrium Solver & Canvas Graph Renderer
   function solveModelEquilibrium() {
     const ad = parseFloat(document.getElementById('demandIntercept').value) || 8;
     const cs = parseFloat(document.getElementById('supplyIntercept').value) || 3;
+    
+    const canvas = document.getElementById('marketCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width;
+    const h = canvas.height;
+    
+    // Canvas Padding & Scaling
+    const padL = 40, padB = 30, padR = 20, padT = 20;
+    const plotW = w - padL - padR;
+    const plotH = h - padT - padB;
+
+    const maxX = 25; // Quantity scale: 0 to 2,500 units
+    const maxP = Math.max(ad + 2, 12); // Price scale
+
+    // Coordinate mapping functions
+    const toCanvasX = (x) => padL + (x / maxX) * plotW;
+    const toCanvasY = (p) => h - padB - (p / maxP) * plotH;
+
+    // Clear Canvas
+    ctx.clearRect(0, 0, w, h);
+
+    // Draw Grid & Axes
+    ctx.strokeStyle = '#f1f5f9';
+    ctx.lineWidth = 1;
+    for (let x = 0; x <= maxX; x += 5) {
+      const cx = toCanvasX(x);
+      ctx.beginPath(); ctx.moveTo(cx, padT); ctx.lineTo(cx, h - padB); ctx.stroke();
+    }
+    for (let p = 0; p <= maxP; p += 2) {
+      const cy = toCanvasY(p);
+      ctx.beginPath(); ctx.moveTo(padL, cy); ctx.lineTo(w - padR, cy); ctx.stroke();
+    }
+
+    // Axes lines
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(padL, padT); ctx.lineTo(padL, h - padB); ctx.lineTo(w - padR, h - padB); ctx.stroke();
+
+    // Axis Labels
+    ctx.fillStyle = '#475569';
+    ctx.font = '11px sans-serif';
+    ctx.fillText('Quantity (x)', w - 70, h - 8);
+    ctx.fillText('Price (p)', 5, 15);
+
+    // Quadratic functions
+    const demandP = (x) => -0.01 * x * x - 0.2 * x + ad;
+    const supplyP = (x) => 0.01 * x * x + 0.1 * x + cs;
+
+    // Plot Demand Curve (Red/Crimson)
+    ctx.strokeStyle = '#dc2626';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    for (let x = 0; x <= maxX; x += 0.2) {
+      const p = demandP(x);
+      if (p < 0) break;
+      const cx = toCanvasX(x);
+      const cy = toCanvasY(p);
+      if (x === 0) ctx.moveTo(cx, cy);
+      else ctx.lineTo(cx, cy);
+    }
+    ctx.stroke();
+
+    // Plot Supply Curve (Blue/Indigo)
+    ctx.strokeStyle = '#2563eb';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    for (let x = 0; x <= maxX; x += 0.2) {
+      const p = supplyP(x);
+      if (p > maxP) break;
+      const cx = toCanvasX(x);
+      const cy = toCanvasY(p);
+      if (x === 0) ctx.moveTo(cx, cy);
+      else ctx.lineTo(cx, cy);
+    }
+    ctx.stroke();
+
+    // Calculate Equilibrium Point
     const a = 0.02, b = 0.3, c = -(ad - cs);
 
     if (c >= 0) {
-      document.getElementById('equilibriumResult').innerText = "No positive equilibrium exists with these parameters!";
+      document.getElementById('equilibriumResult').innerText = "No positive equilibrium exists in Quadrant I!";
       return;
     }
 
     const disc = Math.sqrt(b * b - 4 * a * c);
-    const x = (-b + disc) / (2 * a);
-    const p = -0.01 * x * x - 0.2 * x + ad;
+    const xEq = (-b + disc) / (2 * a);
+    const pEq = demandP(xEq);
 
-    document.getElementById('equilibriumResult').innerText = 
-      `Equilibrium x* = ${x.toFixed(2)} (100s of units) | Price p* = $${p.toFixed(2)}`;
+    if (xEq >= 0 && xEq <= maxX && pEq >= 0) {
+      const cxEq = toCanvasX(xEq);
+      const cyEq = toCanvasY(pEq);
+
+      // Draw dashed reference lines to axes
+      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 1.5;
+
+      ctx.beginPath(); ctx.moveTo(cxEq, h - padB); ctx.lineTo(cxEq, cyEq); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(padL, cyEq); ctx.lineTo(cxEq, cyEq); ctx.stroke();
+      ctx.setLineDash([]); // Reset line dash
+
+      // Draw Equilibrium Dot
+      ctx.fillStyle = '#f59e0b';
+      ctx.beginPath();
+      ctx.arc(cxEq, cyEq, 6, 0, Math.PI * 2);
+      ctx.fill();
+
+      document.getElementById('equilibriumResult').innerHTML = 
+        `<span style="color:#f59e0b;">●</span> Equilibrium: <strong>x* = ${xEq.toFixed(2)}</strong> (100s of units) | <strong>p* = $${pEq.toFixed(2)}</strong>`;
+    } else {
+      document.getElementById('equilibriumResult').innerText = "Equilibrium lies outside plot range.";
+    }
   }
+
+  // Ensure graph initial rendering when DOM loads
+  document.addEventListener("DOMContentLoaded", function() {
+    solveModelEquilibrium();
+  });
 
   // Dynamic Set Operations Calculator
   function parseSetInput(str) {
