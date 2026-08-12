@@ -25,10 +25,10 @@ def on_startup():
 def seed_default_courses():
     """Ensure Subjects and Topics exist and update file paths in DB on restart."""
     with Session(engine) as session:
-        # --- 1. PROBABILITY (PROB101) ---
-        prob_subject = session.exec(select(Subject).where(Subject.subject_code == "PROB101")).first()
+        # --- 1. PROBABILITY (MATH302) ---
+        prob_subject = session.exec(select(Subject).where(Subject.subject_code == "MATH302")).first()
         if not prob_subject:
-            prob_subject = Subject(subject_code="PROB101", title="Probability", description="College Level Probability")
+            prob_subject = Subject(subject_code="MATH302", title="Probability", description="College Level Probability")
             session.add(prob_subject)
             session.commit()
 
@@ -44,7 +44,7 @@ def seed_default_courses():
 
         for idx, (title, status_flag, file_path) in enumerate(prob_topics, start=1):
             existing_topic = session.exec(
-                select(Topic).where(Topic.subject_code == "PROB101", Topic.topic_number == idx)
+                select(Topic).where(Topic.subject_code == "MATH302", Topic.topic_number == idx)
             ).first()
 
             if existing_topic:
@@ -54,7 +54,7 @@ def seed_default_courses():
                 session.add(existing_topic)
             else:
                 topic = Topic(
-                    subject_code="PROB101",
+                    subject_code="MATH302",
                     topic_number=idx,
                     topic_title=title,
                     status=status_flag,
@@ -92,6 +92,122 @@ def seed_default_courses():
             else:
                 topic = Topic(
                     subject_code="STAT101",
+                    topic_number=idx,
+                    topic_title=title,
+                    status=status_flag,
+                    lesson_file_path=file_path
+                )
+                session.add(topic)
+
+        
+
+        # --- 3. MATHEMATICAL ECONOMICS (RC4) ---
+        rc4_subject = session.exec(select(Subject).where(Subject.subject_code == "RC4")).first()
+        if not rc4_subject:
+            rc4_subject = Subject(
+                subject_code="RC4", 
+                title="Mathematical Economics", 
+                description="Mathematical Methods & Models in Economics"
+            )
+            session.add(rc4_subject)
+            session.commit()
+
+        rc4_topics = [
+            ("Topic 1: Static Equilibrium & Matrix Algebra", "published", "lessons/RC4/topic-01-matrix-algebra.html"),
+            ("Topic 2: Comparative Static Analysis & Derivatives", "locked", None),
+            ("Topic 3: Optimization & Unconstrained Problems", "locked", None),
+            ("Topic 4: Constrained Optimization & Lagrange Multipliers", "locked", None),
+        ]
+
+        for idx, (title, status_flag, file_path) in enumerate(rc4_topics, start=1):
+            existing_topic = session.exec(
+                select(Topic).where(Topic.subject_code == "RC4", Topic.topic_number == idx)
+            ).first()
+
+            if existing_topic:
+                existing_topic.topic_title = title
+                existing_topic.status = status_flag
+                existing_topic.lesson_file_path = file_path
+                session.add(existing_topic)
+            else:
+                topic = Topic(
+                    subject_code="RC4",
+                    topic_number=idx,
+                    topic_title=title,
+                    status=status_flag,
+                    lesson_file_path=file_path
+                )
+                session.add(topic)
+
+        # --- 4. PHYSICS FOR INDUSTRIAL TECHNOLOGISTS (BIT02) ---
+        bit02_subject = session.exec(select(Subject).where(Subject.subject_code == "BIT02")).first()
+        if not bit02_subject:
+            bit02_subject = Subject(
+                subject_code="BIT02", 
+                title="Physics for Industrial Technologists", 
+                description="Applied Physics Principles for Industrial Technology"
+            )
+            session.add(bit02_subject)
+            session.commit()
+
+        bit02_topics = [
+            ("Topic 1: Applied Mechanics & Kinematics", "published", "lessons/BIT02/topic-01-mechanics.html"),
+            ("Topic 2: Work, Energy & Power in Industrial Systems", "locked", None),
+            ("Topic 3: Thermodynamics & Heat Transfer", "locked", None),
+            ("Topic 4: Fluid Mechanics & Pneumatics", "locked", None),
+        ]
+
+        for idx, (title, status_flag, file_path) in enumerate(bit02_topics, start=1):
+            existing_topic = session.exec(
+                select(Topic).where(Topic.subject_code == "BIT02", Topic.topic_number == idx)
+            ).first()
+
+            if existing_topic:
+                existing_topic.topic_title = title
+                existing_topic.status = status_flag
+                existing_topic.lesson_file_path = file_path
+                session.add(existing_topic)
+            else:
+                topic = Topic(
+                    subject_code="BIT02",
+                    topic_number=idx,
+                    topic_title=title,
+                    status=status_flag,
+                    lesson_file_path=file_path
+                )
+                session.add(topic)
+
+                # --- 5. MATHEMATICS IN THE MODERN WORLD (GEC4) ---
+        gec4_subject = session.exec(select(Subject).where(Subject.subject_code == "GEC4")).first()
+        if not gec4_subject:
+            gec4_subject = Subject(
+                subject_code="GEC4", 
+                title="Mathematics in the Modern World", 
+                description="Nature of Mathematics, Patterns, & Practical Applications"
+            )
+            session.add(gec4_subject)
+            session.commit()
+
+        gec4_topics = [
+            ("Topic 1: Mathematics in Our World & Patterns in Nature", "published", "lessons/GEC4/topic-01-patterns.html"),
+            ("Topic 2: Mathematical Language & Symbols", "locked", None),
+            ("Topic 3: Problem Solving & Reasoning Strategies", "locked", None),
+            ("Topic 4: Mathematics of Finance", "locked", None),
+        ]
+
+        for idx, (title, status_flag, file_path) in enumerate(gec4_topics, start=1):
+            existing_topic = session.exec(
+                select(Topic).where(Topic.subject_code == "GEC4", Topic.topic_number == idx)
+            ).first()
+
+            if existing_topic:
+                existing_topic.topic_title = title
+                existing_topic.status = status_flag
+                existing_topic.lesson_file_path = file_path
+                session.add(existing_topic)
+            else:
+                topic = Topic(
+                    subject_code="GEC4",
                     topic_number=idx,
                     topic_title=title,
                     status=status_flag,
