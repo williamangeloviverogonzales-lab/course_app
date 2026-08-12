@@ -264,7 +264,8 @@
         <button class="lab-btn" style="padding: 6px 14px;" onclick="plotFromInput()">Plot Point</button>
       </div>
 
-      <canvas id="cartesianCanvas" width="300" height="300"></canvas>
+      <!-- Canvas width/height set to 320x320 so 20px grid lines align perfectly on the 160px origin -->
+      <canvas id="cartesianCanvas" width="320" height="320"></canvas>
       <div id="pointInfo" style="font-weight: 700; color: var(--accent); margin-top: 6px;">Point: (2, -4) | Location: Quadrant IV</div>
     </div>
 
@@ -513,24 +514,34 @@ print("A Difference B:", A - B)</pre>
   const ctx = canvas.getContext('2d');
   const width = canvas.width;
   const height = canvas.height;
-  const originX = width / 2;
-  const originY = height / 2;
-  const scale = 20; // 20px per grid unit
+  const originX = width / 2;  // Exactly 160px
+  const originY = height / 2; // Exactly 160px
+  const scale = 20; // 20px per unit -> grid lines align perfectly on origin!
 
   function drawCartesianGrid(px = 2, py = -4) {
     ctx.clearRect(0, 0, width, height);
 
-    // Grid lines
+    // Draw Grid Lines relative to origin so lines pass EXACTLY through (0,0)
     ctx.strokeStyle = '#e2e8f0';
     ctx.lineWidth = 1;
-    for (let x = 0; x <= width; x += scale) {
-      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
-    }
-    for (let y = 0; y <= height; y += scale) {
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+
+    // Vertical grid lines
+    for (let x = originX % scale; x <= width; x += scale) {
+      ctx.beginPath(); 
+      ctx.moveTo(x + 0.5, 0); 
+      ctx.lineTo(x + 0.5, height); 
+      ctx.stroke();
     }
 
-    // Axes
+    // Horizontal grid lines
+    for (let y = originY % scale; y <= height; y += scale) {
+      ctx.beginPath(); 
+      ctx.moveTo(0, y + 0.5); 
+      ctx.lineTo(width, y + 0.5); 
+      ctx.stroke();
+    }
+
+    // Main Axes
     ctx.strokeStyle = '#475569';
     ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(width, originY); ctx.stroke();
@@ -541,12 +552,12 @@ print("A Difference B:", A - B)</pre>
     ctx.font = '10px sans-serif';
     ctx.fillText('x', width - 12, originY - 5);
     ctx.fillText('y', originX + 5, 12);
-    ctx.fillText('I', width - 30, 25);
+    ctx.fillText('I', width - 25, 25);
     ctx.fillText('II', 15, 25);
     ctx.fillText('III', 15, height - 15);
-    ctx.fillText('IV', width - 30, height - 15);
+    ctx.fillText('IV', width - 25, height - 15);
 
-    // Plot Point
+    // Plot Point on Intersection
     const canvasX = originX + (px * scale);
     const canvasY = originY - (py * scale);
 
@@ -555,7 +566,7 @@ print("A Difference B:", A - B)</pre>
     ctx.arc(canvasX, canvasY, 6, 0, Math.PI * 2);
     ctx.fill();
 
-    // Label
+    // Point Label
     ctx.fillStyle = '#1e1b4b';
     ctx.font = 'bold 12px sans-serif';
     ctx.fillText(`(${px}, ${py})`, canvasX + 8, canvasY - 8);
