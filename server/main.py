@@ -113,11 +113,20 @@ def seed_default_courses():
             session.commit()
 
         rc4_topics = [
-            ("Topic 1: Nature of Mathematical Economics", "published", "lessons/RC4/topic-01-nature-of-mathematical-economics.html"),
-            ("Topic 2: Comparative Static Analysis & Derivatives", "locked", None),
-            ("Topic 3: Optimization & Unconstrained Problems", "locked", None),
-            ("Topic 4: Constrained Optimization & Lagrange Multipliers", "locked", None),
-        ]
+    (
+        "Topic 1: Nature of Mathematical Economics", 
+        "published", 
+        "lessons/RC4/topic-01-nature-of-mathematical-economics.html"
+    ),
+    (
+        "Topic 2: Sets, Real Numbers, Relations & Functions", 
+        "published", 
+        "lessons/RC4/topic-02-foundations-and-functions.html"
+    ),
+    ("Topic 3: Comparative Static Analysis & Derivatives", "locked", None),
+    ("Topic 4: Optimization & Unconstrained Problems", "locked", None),
+    ("Topic 5: Constrained Optimization & Lagrange Multipliers", "locked", None),
+]
 
         for idx, (title, status_flag, file_path) in enumerate(rc4_topics, start=1):
             existing_topic = session.exec(
