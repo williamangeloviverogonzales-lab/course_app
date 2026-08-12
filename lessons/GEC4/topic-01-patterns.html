@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GEC4 - Topic 1: Mathematics in Our World & Patterns</title>
+  <link rel="stylesheet" href="../../static/glass.css">
+  
+  <!-- KaTeX for Mathematics -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body, {
+            delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false}
+            ]
+          });"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; padding: 0 12px 80px 12px;
+      display: flex; flex-direction: column; align-items: center;
+      background: transparent; font-family: system-ui, -apple-system, sans-serif;
+    }
+    .lesson-container { width: 100%; max-width: 680px; display: flex; flex-direction: column; gap: 20px; margin-top: 16px; }
+    .progress-sticky-wrapper { position: sticky; top: 0; z-index: 1000; width: 100%; max-width: 680px; padding: 12px 0; background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+    .progress-card { padding: 12px 18px; border: 1px solid var(--glass-border); border-radius: 14px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); background: var(--glass-bg); display: flex; flex-direction: column; gap: 8px; }
+    .progress-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; font-weight: 600; color: var(--text-main); }
+    .progress-percentage { color: #16a34a; font-weight: 700; font-size: 0.95rem; }
+    .progress-bar-bg { width: 100%; height: 10px; background: rgba(0, 0, 0, 0.08); border-radius: 6px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #6366f1, #16a34a); border-radius: 6px; transition: width 0.4s ease; }
+    .chunk { display: none; padding: 24px 20px; animation: expandDown 0.4s ease forwards; overflow-wrap: break-word; }
+    .chunk.visible { display: block; }
+    @keyframes expandDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+    h2 { margin-top: 0; font-size: 1.28rem; color: var(--accent); }
+    p, li { line-height: 1.6; font-size: 0.98rem; }
+    .concept-box { background: rgba(79, 70, 229, 0.08); border-left: 4px solid var(--accent); padding: 14px 16px; border-radius: 0 10px 10px 0; margin: 16px 0; }
+    .lab-widget { background: rgba(99, 102, 241, 0.06); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 14px; padding: 18px 16px; margin: 18px 0; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+    .lab-btn { padding: 10px 20px; background: linear-gradient(135deg, var(--accent), #4338ca); color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 0.95rem; cursor: pointer; }
+    .question-card { margin-top: 20px; padding: 18px 16px; background: rgba(79, 70, 229, 0.05); border: 1px solid var(--glass-border); border-radius: 14px; }
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+    @media (max-width: 520px) { .options-grid { grid-template-columns: 1fr; } }
+    .option-card { display: flex; align-items: center; justify-content: center; padding: 14px 12px; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-main); border-radius: 12px; cursor: pointer; text-align: center; }
+    .option-card.correct { border-color: #16a34a; background: rgba(22, 163, 74, 0.18); }
+    .option-card.incorrect { border-color: #dc2626; background: rgba(220, 38, 38, 0.18); }
+    .feedback-panel { margin-top: 16px; padding: 14px 16px; border-radius: 10px; display: none; line-height: 1.5; }
+    .feedback-panel.correct { display: block; background: rgba(22, 163, 74, 0.15); border: 1px solid rgba(22, 163, 74, 0.4); }
+    .completion-banner { display: none; text-align: center; padding: 32px 20px; background: rgba(22, 163, 74, 0.12); border: 1px solid rgba(22, 163, 74, 0.3); border-radius: 16px; }
+    .completion-banner.visible { display: block; }
+  </style>
+</head>
+<body>
+
+  <div class="progress-sticky-wrapper">
+    <div class="progress-card">
+      <div class="progress-header">
+        <span id="progressText">GEC4 · Topic 1: Section 1 of 2 Active</span>
+        <span class="progress-percentage" id="progressPercentage">0%</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+    </div>
+  </div>
+
+<div class="lesson-container">
+
+  <!-- CHUNK 0: Fibonacci Concept -->
+  <div class="chunk glass-panel visible" id="chunk-0">
+    <h2>1. Fibonacci Sequence & The Golden Ratio</h2>
+    <p>Mathematics is the science of patterns in nature. The Fibonacci sequence generates spiraling structures found in pinecones, sunflowers, and seashells:</p>
+
+    <div class="concept-box">
+      $$F_0 = 0, \quad F_1 = 1, \quad F_n = F_{n-1} + F_{n-2}$$
+      As $n \to \infty$, the ratio of consecutive terms approaches the Golden Ratio ($\phi$):
+      $$\phi = \lim_{n \to \infty} \frac{F_n}{F_{n-1}} = \frac{1 + \sqrt{5}}{2} \approx 1.6180339887...$$
+    </div>
+
+    <div class="question-card">
+      <div class="question-prompt">
+        <strong>Quick Check:</strong> Given the Fibonacci sequence $1, 1, 2, 3, 5, 8, 13$, what is the next term ($F_8$)?
+      </div>
+      <div class="options-grid">
+        <button class="option-card" onclick="submitOption(this, true, 'chunk-0', 'chunk-1')">21</button>
+        <button class="option-card" onclick="submitOption(this, false, 'chunk-0', 'chunk-1')">19</button>
+      </div>
+      <div class="feedback-panel" id="feedback-chunk-0"></div>
+    </div>
+  </div>
+
+  <!-- CHUNK 1: Interactive Fibonacci Lab -->
+  <div class="chunk glass-panel" id="chunk-1">
+    <h2>2. Interactive Fibonacci Generator</h2>
+    <p>Generate terms and observe how $\frac{F_n}{F_{n-1}}$ rapidly converges toward $\phi \approx 1.61803$: $</p>
+
+    <div class="lab-widget">
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <label>Term count (n): <input type="number" id="fibN" value="10" min="3" max="30" style="width: 60px;"></label>
+        <button class="lab-btn" onclick="genFibonacci()">Generate Sequence</button>
+      </div>
+      <div id="fibOutput" style="font-weight: 600; font-size: 0.9rem; max-width: 100%; word-break: break-word;">[1, 1, 2, 3, 5, 8, 13, 21, 34, 55]</div>
+      <div id="fibRatioOutput" style="font-weight: 700; color: var(--accent);">F₁₀ / F₉ = 55 / 34 ≈ 1.617647</div>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px;">
+      <button class="lab-btn" onclick="finishLesson()">✨ Finish Lesson</button>
+    </div>
+  </div>
+
+  <!-- COMPLETION & PYTHON CODE -->
+  <div class="completion-banner glass-panel" id="completion">
+    <h2 style="color: #16a34a;">🎉 GEC4 Topic 1 Complete!</h2>
+    <p>You've explored patterns in nature and the Golden Ratio!</p>
+  </div>
+
+  <div class="chunk glass-panel" id="python-tutorial" style="display: none; margin-top: 20px; border-top: 2px solid var(--accent);">
+    <h2>🐍 Python Implementation (Fibonacci & Golden Ratio)</h2>
+    <pre style="background: #181825; color: #cdd6f4; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 0.85rem; overflow-x: auto;">def fibonacci(n):
+    seq = [1, 1]
+    for i in range(2, n):
+        seq.append(seq[-1] + seq[-2])
+    return seq
+
+terms = fibonacci(10)
+golden_ratio_approx = terms[-1] / terms[-2]
+
+print("Sequence:", terms)
+print(f"Golden Ratio Approx: {golden_ratio_approx:.6f}")</pre>
+  </div>
+
+</div>
+
+<script>
+  let completedSections = 0; const totalQuestions = 2;
+  function updateProgress() {
+    const pct = Math.round((completedSections / totalQuestions) * 100);
+    document.getElementById('progressFill').style.width = `${pct}%`;
+    document.getElementById('progressPercentage').innerText = `${pct}%`;
+  }
+  function submitOption(btn, isCorrect, currentId, nextId) {
+    const parent = document.getElementById(currentId);
+    const feedback = document.getElementById(`feedback-${currentId}`);
+    parent.querySelectorAll('.option-card').forEach(b => b.disabled = true);
+    if (isCorrect) {
+      btn.classList.add('correct');
+      feedback.className = "feedback-panel correct";
+      feedback.innerHTML = "<strong>Correct!</strong> Moving forward...";
+      revealNext(nextId);
+    }
+  }
+  function revealNext(nextId) {
+    const target = document.getElementById(nextId);
+    if (target && !target.classList.contains('visible')) {
+      target.classList.add('visible');
+      completedSections++; updateProgress();
+    }
+  }
+  function genFibonacci() {
+    const n = parseInt(document.getElementById('fibN').value) || 5;
+    let seq = [1, 1];
+    for (let i = 2; i < n; i++) seq.push(seq[i - 1] + seq[i - 2]);
+    const ratio = seq[seq.length - 1] / seq[seq.length - 2];
+    document.getElementById('fibOutput').innerText = JSON.stringify(seq);
+    document.getElementById('fibRatioOutput').innerText = `F${n} / F${n-1} = ${seq[seq.length - 1]} / ${seq[seq.length - 2]} ≈ ${ratio.toFixed(6)}`;
+  }
+  function finishLesson() {
+    document.getElementById('completion').style.display = 'block';
+    document.getElementById('python-tutorial').style.display = 'block';
+    completedSections = totalQuestions; updateProgress();
+  }
+  updateProgress();
+</script>
+</body>
+</html>
