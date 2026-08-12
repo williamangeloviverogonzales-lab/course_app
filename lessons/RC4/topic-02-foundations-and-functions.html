@@ -178,14 +178,82 @@
       </ul>
     </div>
 
+    <!-- Matrix Classification Question -->
     <div class="question-card">
       <div class="question-prompt">
-        <strong>Quick Check:</strong> Which set represents numbers that cannot be written as a ratio of two integers $\frac{a}{b}$?
+        <strong>Quick Check — Set Classification Challenge:</strong><br>
+        Classify each number by ticking <em>all</em> sets to which it belongs. Leave unticked if it does not belong.
       </div>
-      <div class="options-grid">
-        <button class="option-card" onclick="submitOption(this, true, 'chunk-2', 'chunk-3')">Irrational Numbers ($\mathbb{J}$)</button>
-        <button class="option-card" onclick="submitOption(this, false, 'chunk-2', 'chunk-3')">Rational Numbers ($\mathbb{Q}$)</button>
+
+      <div style="overflow-x: auto; margin-top: 14px;">
+        <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 0.92rem;">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--glass-border); background: rgba(99, 102, 241, 0.1);">
+              <th style="padding: 10px; text-align: left;">Number</th>
+              <th style="padding: 10px;" title="Natural Numbers">$\mathbb{N}$</th>
+              <th style="padding: 10px;" title="Integers">$\mathbb{Z}$</th>
+              <th style="padding: 10px;" title="Rational Numbers">$\mathbb{Q}$</th>
+              <th style="padding: 10px;" title="Irrational Numbers">$\mathbb{J}$</th>
+              <th style="padding: 10px;" title="Real Numbers">$\mathbb{R}$</th>
+            </tr>
+          </thead>
+          <tbody id="matrixTableBody">
+            <tr style="border-bottom: 1px solid var(--glass-border);">
+              <td style="padding: 10px; text-align: left; font-weight: 600;">$5$</td>
+              <td><input type="checkbox" data-row="0" data-col="N"></td>
+              <td><input type="checkbox" data-row="0" data-col="Z"></td>
+              <td><input type="checkbox" data-row="0" data-col="Q"></td>
+              <td><input type="checkbox" data-row="0" data-col="J"></td>
+              <td><input type="checkbox" data-row="0" data-col="R"></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--glass-border);">
+              <td style="padding: 10px; text-align: left; font-weight: 600;">$-7$</td>
+              <td><input type="checkbox" data-row="1" data-col="N"></td>
+              <td><input type="checkbox" data-row="1" data-col="Z"></td>
+              <td><input type="checkbox" data-row="1" data-col="Q"></td>
+              <td><input type="checkbox" data-row="1" data-col="J"></td>
+              <td><input type="checkbox" data-row="1" data-col="R"></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--glass-border);">
+              <td style="padding: 10px; text-align: left; font-weight: 600;">$\frac{3}{4}$</td>
+              <td><input type="checkbox" data-row="2" data-col="N"></td>
+              <td><input type="checkbox" data-row="2" data-col="Z"></td>
+              <td><input type="checkbox" data-row="2" data-col="Q"></td>
+              <td><input type="checkbox" data-row="2" data-col="J"></td>
+              <td><input type="checkbox" data-row="2" data-col="R"></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--glass-border);">
+              <td style="padding: 10px; text-align: left; font-weight: 600;">$\sqrt{2}$</td>
+              <td><input type="checkbox" data-row="3" data-col="N"></td>
+              <td><input type="checkbox" data-row="3" data-col="Z"></td>
+              <td><input type="checkbox" data-row="3" data-col="Q"></td>
+              <td><input type="checkbox" data-row="3" data-col="J"></td>
+              <td><input type="checkbox" data-row="3" data-col="R"></td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--glass-border);">
+              <td style="padding: 10px; text-align: left; font-weight: 600;">$\pi$</td>
+              <td><input type="checkbox" data-row="4" data-col="N"></td>
+              <td><input type="checkbox" data-row="4" data-col="Z"></td>
+              <td><input type="checkbox" data-row="4" data-col="Q"></td>
+              <td><input type="checkbox" data-row="4" data-col="J"></td>
+              <td><input type="checkbox" data-row="4" data-col="R"></td>
+            </tr>
+            <tr>
+              <td style="padding: 10px; text-align: left; font-weight: 600;">$-0.25$</td>
+              <td><input type="checkbox" data-row="5" data-col="N"></td>
+              <td><input type="checkbox" data-row="5" data-col="Z"></td>
+              <td><input type="checkbox" data-row="5" data-col="Q"></td>
+              <td><input type="checkbox" data-row="5" data-col="J"></td>
+              <td><input type="checkbox" data-row="5" data-col="R"></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
+
+      <div style="text-align: center; margin-top: 16px;">
+        <button class="lab-btn" onclick="checkMatrixAnswers()">Check Answers</button>
+      </div>
+
       <div class="feedback-panel" id="feedback-chunk-2"></div>
     </div>
   </div>
@@ -688,6 +756,53 @@ print("A Difference B:", A - B)</pre>
     else quad = "On Axis";
 
     document.getElementById('pointInfo').innerText = `Point: (${px}, ${py}) | Location: ${quad}`;
+  }
+
+  // Ground truth solution matrix [N, Z, Q, J, R]
+  const matrixSolutions = [
+    { num: "5",     N: true,  Z: true,  Q: true,  J: false, R: true  }, // Row 0
+    { num: "-7",    N: false, Z: true,  Q: true,  J: false, R: true  }, // Row 1
+    { num: "3/4",   N: false, Z: false, Q: true,  J: false, R: true  }, // Row 2
+    { num: "sqrt2", N: false, Z: false, Q: false, J: true,  R: true  }, // Row 3
+    { num: "pi",    N: false, Z: false, Q: false, J: true,  R: true  }, // Row 4
+    { num: "-0.25", N: false, Z: false, Q: true,  J: false, R: true  }  // Row 5
+  ];
+
+  function checkMatrixAnswers() {
+    const cols = ["N", "Z", "Q", "J", "R"];
+    let allCorrect = true;
+    let totalErrors = 0;
+
+    matrixSolutions.forEach((sol, rowIndex) => {
+      cols.forEach(col => {
+        const checkbox = document.querySelector(`input[data-row="${rowIndex}"][data-col="${col}"]`);
+        const userValue = checkbox.checked;
+        const expectedValue = sol[col];
+
+        if (userValue !== expectedValue) {
+          allCorrect = false;
+          totalErrors++;
+        }
+      });
+    });
+
+    const feedback = document.getElementById('feedback-chunk-2');
+
+    if (allCorrect) {
+      feedback.className = "feedback-panel correct";
+      feedback.innerHTML = "<strong>🎉 Perfect!</strong> All set classifications are correct. Moving forward...";
+      
+      // Disable checkboxes once solved
+      document.querySelectorAll('#matrixTableBody input[type="checkbox"]').forEach(cb => cb.disabled = true);
+      
+      revealNext('chunk-3');
+    } else {
+      feedback.className = "feedback-panel incorrect";
+      feedback.innerHTML = `<strong>Not quite right!</strong> You have ${totalErrors} misplaced tick(s). Remember:<br>
+      • All natural numbers ($\mathbb{N}$) are integers ($\mathbb{Z}$) and rational ($\mathbb{Q}$).<br>
+      • A number cannot be both Rational ($\mathbb{Q}$) and Irrational ($\mathbb{J}$).<br>
+      • All these examples belong to the Real Numbers ($\mathbb{R}$).`;
+    }
   }
 
   function plotFromInput() {
