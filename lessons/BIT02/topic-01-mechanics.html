@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BIT02 - Topic 1: Applied Mechanics & Kinematics</title>
+  <link rel="stylesheet" href="../../static/glass.css">
+  
+  <!-- KaTeX for Mathematics -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body, {
+            delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false}
+            ]
+          });"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; padding: 0 12px 80px 12px;
+      display: flex; flex-direction: column; align-items: center;
+      background: transparent; font-family: system-ui, -apple-system, sans-serif;
+    }
+    .lesson-container { width: 100%; max-width: 680px; display: flex; flex-direction: column; gap: 20px; margin-top: 16px; }
+    .progress-sticky-wrapper { position: sticky; top: 0; z-index: 1000; width: 100%; max-width: 680px; padding: 12px 0; background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+    .progress-card { padding: 12px 18px; border: 1px solid var(--glass-border); border-radius: 14px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); background: var(--glass-bg); display: flex; flex-direction: column; gap: 8px; }
+    .progress-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; font-weight: 600; color: var(--text-main); }
+    .progress-percentage { color: #16a34a; font-weight: 700; font-size: 0.95rem; }
+    .progress-bar-bg { width: 100%; height: 10px; background: rgba(0, 0, 0, 0.08); border-radius: 6px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #6366f1, #16a34a); border-radius: 6px; transition: width 0.4s ease; }
+    .chunk { display: none; padding: 24px 20px; animation: expandDown 0.4s ease forwards; overflow-wrap: break-word; }
+    .chunk.visible { display: block; }
+    @keyframes expandDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+    h2 { margin-top: 0; font-size: 1.28rem; color: var(--accent); }
+    p, li { line-height: 1.6; font-size: 0.98rem; }
+    .concept-box { background: rgba(79, 70, 229, 0.08); border-left: 4px solid var(--accent); padding: 14px 16px; border-radius: 0 10px 10px 0; margin: 16px 0; }
+    .lab-widget { background: rgba(99, 102, 241, 0.06); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 14px; padding: 18px 16px; margin: 18px 0; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+    .lab-btn { padding: 10px 20px; background: linear-gradient(135deg, var(--accent), #4338ca); color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 0.95rem; cursor: pointer; }
+    .question-card { margin-top: 20px; padding: 18px 16px; background: rgba(79, 70, 229, 0.05); border: 1px solid var(--glass-border); border-radius: 14px; }
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+    @media (max-width: 520px) { .options-grid { grid-template-columns: 1fr; } }
+    .option-card { display: flex; align-items: center; justify-content: center; padding: 14px 12px; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-main); border-radius: 12px; cursor: pointer; text-align: center; }
+    .option-card.correct { border-color: #16a34a; background: rgba(22, 163, 74, 0.18); }
+    .option-card.incorrect { border-color: #dc2626; background: rgba(220, 38, 38, 0.18); }
+    .feedback-panel { margin-top: 16px; padding: 14px 16px; border-radius: 10px; display: none; line-height: 1.5; }
+    .feedback-panel.correct { display: block; background: rgba(22, 163, 74, 0.15); border: 1px solid rgba(22, 163, 74, 0.4); }
+    .completion-banner { display: none; text-align: center; padding: 32px 20px; background: rgba(22, 163, 74, 0.12); border: 1px solid rgba(22, 163, 74, 0.3); border-radius: 16px; }
+    .completion-banner.visible { display: block; }
+  </style>
+</head>
+<body>
+
+  <div class="progress-sticky-wrapper">
+    <div class="progress-card">
+      <div class="progress-header">
+        <span id="progressText">BIT02 · Topic 1: Section 1 of 2 Active</span>
+        <span class="progress-percentage" id="progressPercentage">0%</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+    </div>
+  </div>
+
+<div class="lesson-container">
+
+  <!-- CHUNK 0: Kinematics Concept -->
+  <div class="chunk glass-panel visible" id="chunk-0">
+    <h2>1. Industrial Motion & Kinematics</h2>
+    <p>In industrial automation, predicting position ($d$), initial velocity ($v_0$), constant acceleration ($a$), and elapsed time ($t$) is fundamental for robotic arm movement and conveyor belt timing:</p>
+
+    <div class="concept-box">
+      $$d = v_0 t + \frac{1}{2}a t^2 \quad \text{and} \quad v = v_0 + a t$$
+    </div>
+
+    <div class="question-card">
+      <div class="question-prompt">
+        An automated robot starting from rest ($v_0 = 0\text{ m/s}$) accelerates at $a = 2\text{ m/s}^2$ for $t = 4\text{ seconds}$. What total distance ($d$) does it cover?
+      </div>
+      <div class="options-grid">
+        <button class="option-card" onclick="submitOption(this, true, 'chunk-0', 'chunk-1')">16 meters</button>
+        <button class="option-card" onclick="submitOption(this, false, 'chunk-0', 'chunk-1')">8 meters</button>
+      </div>
+      <div class="feedback-panel" id="feedback-chunk-0"></div>
+    </div>
+  </div>
+
+  <!-- CHUNK 1: Interactive Kinematics Simulator -->
+  <div class="chunk glass-panel" id="chunk-1">
+    <h2>2. Interactive Motion Lab</h2>
+    <p>Simulate industrial robot travel distance by adjusting parameters below:</p>
+
+    <div class="lab-widget">
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+        <label>v₀ (m/s): <input type="number" id="kinV0" value="0" style="width: 60px;"></label>
+        <label>a (m/s²): <input type="number" id="kinA" value="2" style="width: 60px;"></label>
+        <label>t (s): <input type="number" id="kinT" value="4" style="width: 60px;"></label>
+      </div>
+      <button class="lab-btn" onclick="calcKinematics()">Calculate Displacement</button>
+      <div id="kinOutput" style="font-weight: 700; color: var(--accent);">Distance d = 16.00 meters | Final v = 8.00 m/s</div>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px;">
+      <button class="lab-btn" onclick="finishLesson()">✨ Finish Lesson</button>
+    </div>
+  </div>
+
+  <!-- COMPLETION & PYTHON CODE -->
+  <div class="completion-banner glass-panel" id="completion">
+    <h2 style="color: #16a34a;">🎉 BIT02 Topic 1 Complete!</h2>
+    <p>You've mastered industrial kinematic modeling!</p>
+  </div>
+
+  <div class="chunk glass-panel" id="python-tutorial" style="display: none; margin-top: 20px; border-top: 2px solid var(--accent);">
+    <h2>🐍 Python Implementation (Kinematic Displacement)</h2>
+    <pre style="background: #181825; color: #cdd6f4; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 0.85rem; overflow-x: auto;">v0 = 0.0  # initial velocity (m/s)
+a = 2.0   # acceleration (m/s^2)
+t = 4.0   # time duration (s)
+
+# Distance formula d = v0*t + 0.5*a*t^2
+d = (v0 * t) + (0.5 * a * (t ** 2))
+v = v0 + (a * t)
+
+print(f"Displacement (d): {d:.2f} meters")
+print(f"Final Velocity (v): {v:.2f} m/s")</pre>
+  </div>
+
+</div>
+
+<script>
+  let completedSections = 0; const totalQuestions = 2;
+  function updateProgress() {
+    const pct = Math.round((completedSections / totalQuestions) * 100);
+    document.getElementById('progressFill').style.width = `${pct}%`;
+    document.getElementById('progressPercentage').innerText = `${pct}%`;
+  }
+  function submitOption(btn, isCorrect, currentId, nextId) {
+    const parent = document.getElementById(currentId);
+    const feedback = document.getElementById(`feedback-${currentId}`);
+    parent.querySelectorAll('.option-card').forEach(b => b.disabled = true);
+    if (isCorrect) {
+      btn.classList.add('correct');
+      feedback.className = "feedback-panel correct";
+      feedback.innerHTML = "<strong>Correct!</strong> Moving forward...";
+      revealNext(nextId);
+    }
+  }
+  function revealNext(nextId) {
+    const target = document.getElementById(nextId);
+    if (target && !target.classList.contains('visible')) {
+      target.classList.add('visible');
+      completedSections++; updateProgress();
+    }
+  }
+  function calcKinematics() {
+    const v0 = parseFloat(document.getElementById('kinV0').value) || 0;
+    const a = parseFloat(document.getElementById('kinA').value) || 0;
+    const t = parseFloat(document.getElementById('kinT').value) || 0;
+    const d = (v0 * t) + (0.5 * a * (t ** 2));
+    const v = v0 + (a * t);
+    document.getElementById('kinOutput').innerText = `Distance d = ${d.toFixed(2)} meters | Final v = ${v.toFixed(2)} m/s`;
+  }
+  function finishLesson() {
+    document.getElementById('completion').style.display = 'block';
+    document.getElementById('python-tutorial').style.display = 'block';
+    completedSections = totalQuestions; updateProgress();
+  }
+  updateProgress();
+</script>
+</body>
+</html>
