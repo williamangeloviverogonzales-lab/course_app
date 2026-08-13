@@ -188,10 +188,11 @@ def seed_default_courses():
             session.commit()
 
         gec4_topics = [
-            ("Topic 1: Mathematics in Our World & Patterns in Nature", "published", "lessons/GEC4/topic-01-patterns.html"),
-            ("Topic 2: Mathematical Language & Symbols", "locked", None),
-            ("Topic 3: Problem Solving & Reasoning Strategies", "locked", None),
-            ("Topic 4: Mathematics of Finance", "locked", None),
+            ("Topic 1: Mathematics and Nature", "published", "lessons/GEC4/topic-01-patterns.html"),
+            ("Topic 2: Fibonacci Sequence", "published", "lessons/GEC4/topic-02-fibonacci.html"),
+            ("Topic 3: Mathematical Language & Symbols", "locked", None),
+            ("Topic 4: Problem Solving & Reasoning Strategies", "locked", None),
+            ("Topic 5: Mathematics of Finance", "locked", None),
         ]
 
         for idx, (title, status_flag, file_path) in enumerate(gec4_topics, start=1):
