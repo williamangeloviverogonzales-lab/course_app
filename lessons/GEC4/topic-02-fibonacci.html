@@ -332,7 +332,7 @@
       
       <div style="display: flex; gap: 8px; align-items: center; margin-top: 4px;">
         <label style="font-size: 0.85rem; font-weight: 600;">Number of Squares ($n$): 
-          <input type="number" id="spiralN" value="6" min="1" max="10" style="width: 100px;" class="text-input" onchange="drawGoldenSpiral()">
+          <input type="number" id="spiralN" value="1" min="1" max="10" style="width: 100px;" class="text-input" onchange="drawGoldenSpiral()">
         </label>
         <button class="lab-btn" onclick="drawGoldenSpiral()">Construct</button>
       </div>
@@ -662,7 +662,7 @@ print("F(18) via Binet's Formula:", binet_fibonacci(18))</pre>
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     
-    let n = parseInt(document.getElementById('spiralN').value) || 6;
+    let n = parseInt(document.getElementById('spiralN').value) || 1;
     n = Math.max(1, Math.min(n, 10)); // Clamp between 1 and 10
 
     // Compute Fibonacci terms
@@ -673,7 +673,7 @@ print("F(18) via Binet's Formula:", binet_fibonacci(18))</pre>
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // 1. BOUNDING BOX & SQUARE COORDINATES
+    // 1. BOUNDING BOX & SQUARE COORDINATES (MATH SPACE)
     let xMin = 0, xMax = 1;
     let yMin = 0, yMax = 1;
 
@@ -717,24 +717,20 @@ print("F(18) via Binet's Formula:", binet_fibonacci(18))</pre>
       squares.push(sq);
     }
 
-    // 2. CANVAS SCALING & COORDINATE CONVERSION
-    const totalWidth = xMax - xMin;
-    const totalHeight = yMax - yMin;
+    // 2. FIXED SCALE & CENTERED ORIGIN
+    // 1 unit = 24 pixels (fixed, so Square 1 stays at a fixed 24px x 24px size)
+    const scale = 24;
 
-    const padding = 24;
-    const scaleX = (canvas.width - 2 * padding) / totalWidth;
-    const scaleY = (canvas.height - 2 * padding) / totalHeight;
-    const scale = Math.min(scaleX, scaleY);
-
-    const offsetX = padding + (canvas.width - 2 * padding - totalWidth * scale) / 2 - xMin * scale;
-    const offsetY = canvas.height - (padding + (canvas.height - 2 * padding - totalHeight * scale) / 2 + yMin * scale);
+    // Anchor (0,0) in math space directly to the middle of the canvas
+    const offsetX = canvas.width / 2;
+    const offsetY = canvas.height / 2;
 
     const toCanvasX = (x) => offsetX + x * scale;
     const toCanvasY = (y) => offsetY - y * scale;
 
     const colors = ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4'];
 
-    // 3. RENDER SQUARES & SPIRAL
+    // 3. RENDER SQUARES & SPIRAL ARCS
     squares.forEach((sq, idx) => {
       let cX1 = toCanvasX(sq.xMin);
       let cY1 = toCanvasY(sq.yMax);
@@ -749,7 +745,7 @@ print("F(18) via Binet's Formula:", binet_fibonacci(18))</pre>
       ctx.strokeRect(cX1, cY1, cWidth, cHeight);
 
       // Label Side Length
-      if (cWidth > 18) {
+      if (cWidth >= 16) {
         ctx.fillStyle = '#334155';
         ctx.font = 'bold 12px sans-serif';
         ctx.textAlign = 'center';
@@ -757,7 +753,7 @@ print("F(18) via Binet's Formula:", binet_fibonacci(18))</pre>
         ctx.fillText(`F${sq.index}=${sq.side}`, cX1 + cWidth / 2, cY1 + cHeight / 2);
       }
 
-      // Exact Mathematical Arc Centers & Sweeps
+      // Exact Mathematical Arc Centers
       let centerMathX, centerMathY, startAngle, endAngle;
 
       if (sq.index === 1) { // Sq 1: Center (1, 1), sweeps (0,1) -> (1,0)
@@ -776,8 +772,6 @@ print("F(18) via Binet's Formula:", binet_fibonacci(18))</pre>
         centerMathX = 2; centerMathY = 0;
         startAngle = Math.PI; endAngle = 1.5 * Math.PI;
       } else {
-        // General Recursive Center Rule for Sq >= 6:
-        // Square attaches relative to current bounding box corners
         if (sq.dir === 1) { // Right
           centerMathX = sq.xMin; centerMathY = sq.yMax;
           startAngle = 1.5 * Math.PI; endAngle = 2 * Math.PI;
@@ -800,7 +794,6 @@ print("F(18) via Binet's Formula:", binet_fibonacci(18))</pre>
       ctx.beginPath();
       ctx.strokeStyle = '#dc2626';
       ctx.lineWidth = 3;
-      // Invert y angles for Canvas screen space
       ctx.arc(cCenterX, cCenterY, cRadius, 2 * Math.PI - startAngle, 2 * Math.PI - endAngle, true);
       ctx.stroke();
     });
@@ -808,6 +801,8 @@ print("F(18) via Binet's Formula:", binet_fibonacci(18))</pre>
     // Update Dimensions Text
     const dimText = document.getElementById('spiralDimensionsText');
     if (dimText) {
+      const totalWidth = xMax - xMin;
+      const totalHeight = yMax - yMin;
       dimText.innerText = `Bounding Rectangle: ${totalWidth} × ${totalHeight} (Ratio: ${(totalWidth / totalHeight).toFixed(4)})`;
     }
   }
