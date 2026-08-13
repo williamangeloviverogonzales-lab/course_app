@@ -547,8 +547,17 @@ print("F(18) via Binet's Formula:", binet_fibonacci(18))</pre>
   function submitOption(btn, isCorrect, currentChunkId, nextChunkId) {
     const parent = document.getElementById(currentChunkId);
     const feedback = document.getElementById(`feedback-${currentChunkId}`);
-    parent.querySelectorAll('.option-card').forEach(b => { b.disabled = true; b.classList.remove('correct', 'incorrect'); });
-    if (isCorrect) {
+    
+    // Disable all options in the current question card
+    parent.querySelectorAll('.option-card').forEach(b => { 
+      b.disabled = true; 
+      b.classList.remove('correct', 'incorrect'); 
+    });
+
+    // Ensure strict boolean evaluation
+    const correct = (isCorrect === true || isCorrect === 'true');
+
+    if (correct) {
       btn.classList.add('correct');
       feedback.className = "feedback-panel correct";
       feedback.style.display = "block";
@@ -560,7 +569,10 @@ print("F(18) via Binet's Formula:", binet_fibonacci(18))</pre>
       feedback.style.display = "block";
       feedback.innerHTML = `<strong>Not quite.</strong> Review concept above.<br><button class="continue-btn" onclick="handleNextStep('${nextChunkId}')">Continue Anyway →</button>`;
     }
-    if (window.renderMathInElement) renderMathInElement(feedback, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}] });
+    
+    if (window.renderMathInElement) {
+      renderMathInElement(feedback, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}] });
+    }
   }
 
   function checkInput(currentChunkId, correctAnswer, nextChunkId) {
