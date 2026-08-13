@@ -154,6 +154,63 @@
       $$F_n = \begin{cases} n & \text{if } n = 0 \text{ or } n = 1 \\ F_{n-2} + F_{n-1} & \text{if } n \ge 2 \end{cases}$$
     </div>
 
+    <!-- SEQUENCE LOOKUP TABLE -->
+    <div style="overflow-x: auto; margin: 18px 0;">
+      <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 0.9rem;">
+        <thead>
+          <tr style="background: rgba(99, 102, 241, 0.15); border-bottom: 2px solid var(--accent);">
+            <th style="padding: 8px; border: 1px solid var(--glass-border);">$n$</th>
+            <th style="padding: 8px; border: 1px solid var(--glass-border);">0</th>
+            <th style="padding: 8px; border: 1px solid var(--glass-border);">1</th>
+            <th style="padding: 8px; border: 1px solid var(--glass-border);">2</th>
+            <th style="padding: 8px; border: 1px solid var(--glass-border);">3</th>
+            <th style="padding: 8px; border: 1px solid var(--glass-border);">4</th>
+            <th style="padding: 8px; border: 1px solid var(--glass-border);">5</th>
+            <th style="padding: 8px; border: 1px solid var(--glass-border);">6</th>
+            <th style="padding: 8px; border: 1px solid var(--glass-border);">7</th>
+            <th style="padding: 8px; border: 1px solid var(--glass-border);">8</th>
+            <th style="padding: 8px; border: 1px solid var(--glass-border);">9</th>
+            <th style="padding: 8px; border: 1px solid var(--glass-border);">10</th>
+            <th style="padding: 8px; border: 1px solid var(--glass-border);">11</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding: 8px; font-weight: bold; border: 1px solid var(--glass-border); background: rgba(99, 102, 241, 0.08);">$F_n$</td>
+            <td style="padding: 8px; border: 1px solid var(--glass-border);">0</td>
+            <td style="padding: 8px; border: 1px solid var(--glass-border);">1</td>
+            <td style="padding: 8px; border: 1px solid var(--glass-border);">1</td>
+            <td style="padding: 8px; border: 1px solid var(--glass-border);">2</td>
+            <td style="padding: 8px; border: 1px solid var(--glass-border);">3</td>
+            <td style="padding: 8px; border: 1px solid var(--glass-border);">5</td>
+            <td style="padding: 8px; border: 1px solid var(--glass-border);">8</td>
+            <td style="padding: 8px; border: 1px solid var(--glass-border);">13</td>
+            <td style="padding: 8px; border: 1px solid var(--glass-border);">21</td>
+            <td style="padding: 8px; border: 1px solid var(--glass-border);">34</td>
+            <td style="padding: 8px; border: 1px solid var(--glass-border);">55</td>
+            <td style="padding: 8px; border: 1px solid var(--glass-border);">89</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- INTERACTIVE LAB: FIRST N FIBONACCI NUMBERS -->
+    <div class="lab-widget">
+      <div style="font-weight: 700; font-size: 0.9rem; color: var(--accent);">LAB: EXPLORE THE FIRST N FIBONACCI TERMS</div>
+      <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">Enter $n$ to generate terms from $F_0$ to $F_n$:</p>
+      
+      <div style="display: flex; gap: 8px; align-items: center; margin-top: 4px;">
+        <label style="font-size: 0.85rem; font-weight: 600;">Max index $n$: 
+          <input type="number" id="seqLabN" value="12" min="0" max="30" style="width: 65px;" class="text-input">
+        </label>
+        <button class="lab-btn" onclick="generateNTerms()">Generate</button>
+      </div>
+
+      <div style="font-size: 0.88rem; line-height: 1.5; font-weight: 600; color: var(--text-main); word-break: break-word; width: 100%; margin-top: 6px;" id="seqLabOutput">
+        $F_0 = 0$, $F_1 = 1$, $F_2 = 1$, $F_3 = 2$, $F_4 = 3$, $F_5 = 5$, $F_6 = 8$, $F_7 = 13$, $F_8 = 21$, $F_9 = 34$, $F_{10} = 55$, $F_{11} = 89$, $F_{12} = 144$
+      </div>
+    </div>
+
     <div class="question-card">
       <div class="question-prompt">
         Given $F_9 = 34$ and $F_{10} = 55$, calculate the next term $F_{11}$:
@@ -520,6 +577,34 @@ print("F(18) via Binet's Formula:", binet_fibonacci(18))</pre>
     const phi = (1 + Math.sqrt(5)) / 2;
     const val = Math.round((Math.pow(phi, n) - Math.pow(1 - phi, n)) / Math.sqrt(5));
     document.getElementById('binetResult').innerText = `F${n} = ${val.toLocaleString()}`;
+  }
+
+  function generateNTerms() {
+    const nInput = parseInt(document.getElementById('seqLabN').value);
+    if (isNaN(nInput) || nInput < 0) return;
+    
+    const limit = Math.min(nInput, 30); // limit to prevent UI overflow
+    let fibs = [0, 1];
+    for (let i = 2; i <= limit; i++) {
+      fibs[i] = fibs[i - 1] + fibs[i - 2];
+    }
+
+    let output = [];
+    for (let i = 0; i <= limit; i++) {
+      output.push(`$F_{${i}} = ${fibs[i]}$`);
+    }
+
+    const outputEl = document.getElementById('seqLabOutput');
+    outputEl.innerHTML = output.join(', ');
+    
+    if (window.renderMathInElement) {
+      renderMathInElement(outputEl, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false}
+        ]
+      });
+    }
   }
 
   function copyCode(elementId, btn) {
