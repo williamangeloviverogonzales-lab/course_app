@@ -673,8 +673,7 @@ print("F(18) via Binet's Formula:", binet_fibonacci(18))</pre>
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // 1. MATHEMATICAL BOUNDING BOX TRACKING
-    // Start with Square 1 at (0, 0) to (1, 1)
+    // 1. BOUNDING BOX & SQUARE COORDINATES
     let xMin = 0, xMax = 1;
     let yMin = 0, yMax = 1;
 
@@ -686,29 +685,28 @@ print("F(18) via Binet's Formula:", binet_fibonacci(18))</pre>
 
       let sq = { index: i, side: side, dir: dir };
 
-      if (i === 1) {
-        // Square 1
+      if (i === 1) { // Square 1
         sq.xMin = 0; sq.xMax = 1;
         sq.yMin = 0; sq.yMax = 1;
-      } else if (dir === 1) { // 0 -> RIGHT (Square 2, 6, etc.)
+      } else if (dir === 1) { // Right (Square 2, 6, etc.)
         sq.xMin = xMax;
         sq.xMax = xMax + side;
         sq.yMin = yMin;
         sq.yMax = yMax;
         xMax = sq.xMax;
-      } else if (dir === 2) { // 1 -> UP (Square 3, 7, etc.)
+      } else if (dir === 2) { // Up (Square 3, 7, etc.)
         sq.xMin = xMin;
         sq.xMax = xMax;
         sq.yMin = yMax;
         sq.yMax = yMax + side;
         yMax = sq.yMax;
-      } else if (dir === 3) { // 2 -> LEFT (Square 4, 8, etc.)
+      } else if (dir === 3) { // Left (Square 4, 8, etc.)
         sq.xMin = xMin - side;
         sq.xMax = xMin;
         sq.yMin = yMin;
         sq.yMax = yMax;
         xMin = sq.xMin;
-      } else if (dir === 0) { // 3 -> DOWN (Square 5, 9, etc.)
+      } else if (dir === 0) { // Down (Square 5, 9, etc.)
         sq.xMin = xMin;
         sq.xMax = xMax;
         sq.yMin = yMin - side;
@@ -728,31 +726,29 @@ print("F(18) via Binet's Formula:", binet_fibonacci(18))</pre>
     const scaleY = (canvas.height - 2 * padding) / totalHeight;
     const scale = Math.min(scaleX, scaleY);
 
-    // Center the bounding rectangle inside canvas
     const offsetX = padding + (canvas.width - 2 * padding - totalWidth * scale) / 2 - xMin * scale;
     const offsetY = canvas.height - (padding + (canvas.height - 2 * padding - totalHeight * scale) / 2 + yMin * scale);
 
-    // Math (x, y) -> Canvas (cX, cY) conversion functions
     const toCanvasX = (x) => offsetX + x * scale;
-    const toCanvasY = (y) => offsetY - y * scale; // Y inverted for HTML canvas
+    const toCanvasY = (y) => offsetY - y * scale;
 
     const colors = ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4'];
 
-    // 3. RENDER RECTANGLES & SPIRAL ARCS
+    // 3. RENDER SQUARES & SPIRAL
     squares.forEach((sq, idx) => {
       let cX1 = toCanvasX(sq.xMin);
-      let cY1 = toCanvasY(sq.yMax); // Top-left in Canvas Y
+      let cY1 = toCanvasY(sq.yMax);
       let cWidth = (sq.xMax - sq.xMin) * scale;
       let cHeight = (sq.yMax - sq.yMin) * scale;
 
-      // Draw Square Box
+      // Fill & Stroke Square
       ctx.fillStyle = colors[idx % colors.length] + '22';
       ctx.strokeStyle = colors[idx % colors.length];
       ctx.lineWidth = 2;
       ctx.fillRect(cX1, cY1, cWidth, cHeight);
       ctx.strokeRect(cX1, cY1, cWidth, cHeight);
 
-      // Side Length Label
+      // Label Side Length
       if (cWidth > 18) {
         ctx.fillStyle = '#334155';
         ctx.font = 'bold 12px sans-serif';
@@ -761,40 +757,51 @@ print("F(18) via Binet's Formula:", binet_fibonacci(18))</pre>
         ctx.fillText(`F${sq.index}=${sq.side}`, cX1 + cWidth / 2, cY1 + cHeight / 2);
       }
 
-      // Draw Spiral Arc based on exact mathematical corner centers
-      ctx.beginPath();
-      ctx.strokeStyle = '#dc2626';
-      ctx.lineWidth = 3;
-
+      // Exact Mathematical Arc Centers & Sweeps
       let centerMathX, centerMathY, startAngle, endAngle;
 
-      if (sq.index === 1) {
-        // Sq 1: Center at Bottom-Right (1, 0), sweeps Top-Right -> Bottom-Left
-        centerMathX = sq.xMax; centerMathY = sq.yMin;
-        startAngle = 1.5 * Math.PI; endAngle = Math.PI;
-      } else if (sq.dir === 1) { 
-        // Dir 0 -> Right (Sq 2): Center at Bottom-Right, sweeps Bottom-Left -> Top-Right
-        centerMathX = sq.xMax; centerMathY = sq.yMin;
+      if (sq.index === 1) { // Sq 1: Center (1, 1), sweeps (0,1) -> (1,0)
+        centerMathX = 1; centerMathY = 1;
         startAngle = Math.PI; endAngle = 1.5 * Math.PI;
-      } else if (sq.dir === 2) { 
-        // Dir 1 -> Up (Sq 3): Center at Bottom-Left, sweeps Bottom-Right -> Top-Left
-        centerMathX = sq.xMin; centerMathY = sq.yMin;
-        startAngle = 0; endAngle = 1.5 * Math.PI;
-      } else if (sq.dir === 3) { 
-        // Dir 2 -> Left (Sq 4): Center at Top-Left, sweeps Top-Right -> Bottom-Left
-        centerMathX = sq.xMin; centerMathY = sq.yMax;
-        startAngle = 0.5 * Math.PI; endAngle = 0;
-      } else if (sq.dir === 0) { 
-        // Dir 3 -> Down (Sq 5): Center at Top-Right, sweeps Top-Left -> Bottom-Right
-        centerMathX = sq.xMax; centerMathY = sq.yMax;
-        startAngle = Math.PI; endAngle = 0.5 * Math.PI;
+      } else if (sq.index === 2) { // Sq 2: Center (1, 1), sweeps (1,0) -> (2,1)
+        centerMathX = 1; centerMathY = 1;
+        startAngle = 1.5 * Math.PI; endAngle = 2 * Math.PI;
+      } else if (sq.index === 3) { // Sq 3: Center (0, 1), sweeps (2,1) -> (0,3)
+        centerMathX = 0; centerMathY = 1;
+        startAngle = 0; endAngle = 0.5 * Math.PI;
+      } else if (sq.index === 4) { // Sq 4: Center (0, 0), sweeps (0,3) -> (-3,0)
+        centerMathX = 0; centerMathY = 0;
+        startAngle = 0.5 * Math.PI; endAngle = Math.PI;
+      } else if (sq.index === 5) { // Sq 5: Center (2, 0), sweeps (-3,0) -> (2,-5)
+        centerMathX = 2; centerMathY = 0;
+        startAngle = Math.PI; endAngle = 1.5 * Math.PI;
+      } else {
+        // General Recursive Center Rule for Sq >= 6:
+        // Square attaches relative to current bounding box corners
+        if (sq.dir === 1) { // Right
+          centerMathX = sq.xMin; centerMathY = sq.yMax;
+          startAngle = 1.5 * Math.PI; endAngle = 2 * Math.PI;
+        } else if (sq.dir === 2) { // Up
+          centerMathX = sq.xMin; centerMathY = sq.yMin;
+          startAngle = 0; endAngle = 0.5 * Math.PI;
+        } else if (sq.dir === 3) { // Left
+          centerMathX = sq.xMax; centerMathY = sq.yMin;
+          startAngle = 0.5 * Math.PI; endAngle = Math.PI;
+        } else if (sq.dir === 0) { // Down
+          centerMathX = sq.xMax; centerMathY = sq.yMax;
+          startAngle = Math.PI; endAngle = 1.5 * Math.PI;
+        }
       }
 
       let cCenterX = toCanvasX(centerMathX);
       let cCenterY = toCanvasY(centerMathY);
       let cRadius = sq.side * scale;
 
-      ctx.arc(cCenterX, cCenterY, cRadius, startAngle, endAngle, true); // Counter-clockwise drawing
+      ctx.beginPath();
+      ctx.strokeStyle = '#dc2626';
+      ctx.lineWidth = 3;
+      // Invert y angles for Canvas screen space
+      ctx.arc(cCenterX, cCenterY, cRadius, 2 * Math.PI - startAngle, 2 * Math.PI - endAngle, true);
       ctx.stroke();
     });
 
