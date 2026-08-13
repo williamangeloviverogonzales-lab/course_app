@@ -37,7 +37,7 @@ class Topic(SQLModel, table=True):
     topic_number: int                            # 1, 2, 3, etc.
     topic_title: str                             # e.g. "Sample Spaces & Set Operations"
     status: str = Field(default="locked")        # published, draft, locked
-    lesson_file_path: Optional[str] = None       # e.g. lessons/PROB101/topic-01-sample-spaces.html
+    lesson_file_path: Optional[str] = None       # e.g. lessons/MATH302/topic-01-sample-spaces.html
 
     subject: Subject = Relationship(back_populates="topics")
 
