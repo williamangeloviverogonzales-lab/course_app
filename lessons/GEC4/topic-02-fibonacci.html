@@ -317,7 +317,7 @@
 
   <!-- CHUNK: The Golden Rectangle & Spiral -->
   <div class="chunk glass-panel" id="chunk-golden-rectangle">
-    <h2>Golden Rectangle & Golden Spiral</h2>
+    <h2>5. Golden Rectangle & Golden Spiral</h2>
     <p>A <strong>Golden Rectangle</strong> is a rectangle whose side lengths are in the golden ratio, $\phi \approx 1.618$.</p>
 
     <div class="concept-box">
@@ -361,7 +361,7 @@
 
   <!-- CHUNK 4: Binet's Formula -->
   <div class="chunk glass-panel" id="chunk-4">
-    <h2>5. Binet's Formula</h2>
+    <h2>6. Binet's Formula</h2>
     <p>In 1843, French mathematician Jacques-Philippe-Marie Binet derived an explicit formula to compute $F_n$ directly without calculating preceding terms:</p>
 
     <div class="concept-box">
@@ -397,7 +397,7 @@
 
   <!-- CHUNK 5: Fibonacci in Nature & Zoology -->
   <div class="chunk glass-panel" id="chunk-5">
-    <h2>6. Fibonacci in Flora & Fauna</h2>
+    <h2>7. Fibonacci in Flora & Fauna</h2>
     <p>Natural efficiency and developmental growth exhibit Fibonacci numbers across living organisms:</p>
 
     <div class="concept-box">
@@ -428,7 +428,7 @@
 
   <!-- CHUNK 6: Problem Set Practice (Part 1) -->
   <div class="chunk glass-panel" id="chunk-6">
-    <h2>7. Exercise Practice: Term Equations</h2>
+    <h2>8. Exercise Practice: Term Equations</h2>
     <p>Let's solve the formal evaluation problems from the lesson text:</p>
 
     <div class="concept-box">
@@ -452,7 +452,7 @@
 
   <!-- CHUNK 7: True/False Identities & Grand Finale -->
   <div class="chunk glass-panel" id="chunk-7">
-    <h2>8. Fibonacci Mathematical Identities</h2>
+    <h2>9. Fibonacci Mathematical Identities</h2>
     <p>Test your conceptual understanding of advanced Fibonacci algebraic identities:</p>
 
     <div class="concept-box">
@@ -541,7 +541,7 @@ print("F(18) via Binet's Formula:", binet_fibonacci(18))</pre>
     const percentage = Math.round((completedSections / totalQuestions) * 100);
     document.getElementById('progressFill').style.width = `${percentage}%`;
     document.getElementById('progressPercentage').innerText = `${percentage}%`;
-    document.getElementById('progressText').innerText = completedSections < totalQuestions ? `Topic 2: Section ${completedSections + 1} of 9 Active` : `Topic 2 Complete! 🎉`;
+    document.getElementById('progressText').innerText = completedSections < totalQuestions ? `Topic 2: Section ${completedSections + 1} of ${totalQuestions} Active` : `Topic 2 Complete! 🎉`;
   }
 
   function submitOption(btn, isCorrect, currentChunkId, nextChunkId) {
@@ -600,7 +600,7 @@ print("F(18) via Binet's Formula:", binet_fibonacci(18))</pre>
     }
     if (window.renderMathInElement) renderMathInElement(nextTarget, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}] });
     
-    // Trigger canvas draw after element becomes visible in layout
+    // Draw canvas after container becomes visible
     if (nextId === 'chunk-golden-rectangle') {
       setTimeout(drawGoldenSpiral, 150);
     }
