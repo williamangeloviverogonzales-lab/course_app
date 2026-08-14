@@ -150,10 +150,10 @@ def seed_default_courses():
             session.commit()
 
         bit04_topics = [
-            ("Topic 1: Applied Mechanics & Kinematics", "published", "lessons/BIT04/topic-01-mechanics.html"),
-            ("Topic 2: Work, Energy & Power in Industrial Systems", "locked", None),
-            ("Topic 3: Thermodynamics & Heat Transfer", "locked", None),
-            ("Topic 4: Fluid Mechanics & Pneumatics", "locked", None),
+            ("Topic 1: Units & Physical Quantities", "published", "lessons/BIT04/topic-01-units.html"),
+            ("Topic 2: Vectors", "published", "lessons/BIT04/topic-02-vectors.html"),
+            ("Topic 3: Kinematics", "locked", None),
+            ("Topic 4: Electricity & Magnetism", "locked", None),
         ]
 
         for idx, (title, status_flag, file_path) in enumerate(bit04_topics, start=1):
