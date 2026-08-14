@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Analytics Dashboard</title>
+  <link rel="stylesheet" href="/static/glass.css">
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 24px; background: #f8fafc; color: #0f172a; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .nav-tabs { display: flex; gap: 8px; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; }
+    .tab-btn { padding: 10px 20px; border: none; background: transparent; font-size: 0.95rem; font-weight: 600; cursor: pointer; color: #64748b; border-bottom: 3px solid transparent; }
+    .tab-btn.active { color: #6366f1; border-bottom-color: #6366f1; }
+    .card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.03); overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+    th, td { padding: 12px; border-bottom: 1px solid #f1f5f9; }
+    th { background: #f8fafc; color: #475569; font-weight: 700; }
+    .badge-active { padding: 4px 8px; background: rgba(22,163,74,0.15); color: #16a34a; border-radius: 6px; font-weight: 700; font-size: 0.78rem; }
+    .badge-never { padding: 4px 8px; background: rgba(100,116,139,0.15); color: #64748b; border-radius: 6px; font-weight: 600; font-size: 0.78rem; }
+    .prog-pill { display: inline-block; padding: 3px 8px; border-radius: 10px; font-weight: 700; font-size: 0.8rem; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div>
+      <h2 style="margin: 0; color: #6366f1;">🎓 Teacher Analytics Dashboard</h2>
+      <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.9rem;">Track real-time student access & topic progress across subjects</p>
+    </div>
+    <button onclick="loadDashboard(currentSubject)" style="padding: 8px 16px; background: #6366f1; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">🔄 Refresh Data</button>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('BIT04', this)">BIT04 (Physics)</button>
+    <button class="tab-btn" onclick="switchTab('MATH302', this)">MATH302 (Probability)</button>
+    <button class="tab-btn" onclick="switchTab('STAT101', this)">STAT101 (Statistics)</button>
+    <button class="tab-btn" onclick="switchTab('RC4', this)">RC4 (Math Econ)</button>
+    <button class="tab-btn" onclick="switchTab('GEC4', this)">GEC4 (MMW)</button>
+  </div>
+
+  <div class="card">
+    <table id="analyticsTable">
+      <thead><tr id="tableHeader"><th>Student ID</th><th>Name</th><th>Last Access</th></tr></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+<script>
+  let currentSubject = "BIT04";
+
+  function switchTab(subCode, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentSubject = subCode;
+    loadDashboard(subCode);
+  }
+
+  async function loadDashboard(subCode) {
+    const res = await fetch(`/api/admin/dashboard/${subCode}`);
+    const data = await res.json();
+
+    const header = document.getElementById('tableHeader');
+    header.innerHTML = `<th>Student ID</th><th>Student Name</th><th>Last Login</th>`;
+    data.topics.forEach(t => {
+      header.innerHTML += `<th style="text-align: center;">T${t.topic_number} Progress</th>`;
+    });
+
+    const body = document.getElementById('tableBody');
+    body.innerHTML = '';
+
+    data.students.forEach(s => {
+      let rowHtml = `<tr>
+        <td style="font-family: monospace; font-weight: 600;">${s.student_id}</td>
+        <td><strong>${s.name}</strong></td>
+        <td>${s.last_login !== "Never" ? `<span class="badge-active">🟢 ${s.last_login}</span>` : `<span class="badge-never">⚪ Never</span>`}</td>
+      `;
+
+      s.progress.forEach(p => {
+        let color = p.percent === 100 ? "background: rgba(22,163,74,0.18); color: #16a34a;" : p.percent > 0 ? "background: rgba(245,158,11,0.18); color: #d97706;" : "background: #f1f5f9; color: #94a3b8;";
+        rowHtml += `<td style="text-align: center;"><span class="prog-pill" style="${color}">${p.percent}%</span></td>`;
+      });
+
+      rowHtml += `</tr>`;
+      body.innerHTML += rowHtml;
+    });
+  }
+
+  loadDashboard('BIT04');
+</script>
+</body>
+</html>

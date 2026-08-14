@@ -1,6 +1,7 @@
 import csv
 import os
-from typing import List
+from datetime import datetime
+from typing import List, Optional
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -8,7 +9,7 @@ from sqlmodel import Session, select
 from pydantic import BaseModel
 
 from server.database import init_db, get_session, engine
-from server.models import Student, Subject, Section, Topic, Enrollment
+from server.models import Student, Subject, Section, Topic, Enrollment, LessonProgress
 
 app = FastAPI(title="Academic Course Portal API")
 
@@ -291,12 +292,24 @@ class AuthRequest(BaseModel):
     student_id: str
     subject_code: str
 
+class ProgressUpdate(BaseModel):
+    student_id: str
+    subject_code: str
+    topic_number: int
+    progress_percent: int
+    completed: bool = False
+
 # --- ROUTES ---
 
 @app.get("/")
 def serve_portal():
     """Serve the main Portal Shell."""
     return FileResponse("static/index.html")
+
+@app.get("/admin")
+def serve_admin_dashboard():
+    """Serve the Teacher Analytics Dashboard."""
+    return FileResponse("static/admin.html")
 
 @app.post("/api/verify-access")
 def verify_student_access(auth: AuthRequest, session: Session = Depends(get_session)):
@@ -308,6 +321,13 @@ def verify_student_access(auth: AuthRequest, session: Session = Depends(get_sess
     is_enrolled = any(sec.subject_code == auth.subject_code for sec in student.sections)
     if not is_enrolled:
         raise HTTPException(status_code=403, detail=f"Access Denied: You are not enrolled in {auth.subject_code}.")
+
+    # Log access timestamp to database and console
+    student.last_login = datetime.utcnow()
+    session.add(student)
+    session.commit()
+
+    print(f"[ACCESS LOG] Student {student.name} ({student.student_id}) accessed {auth.subject_code}")
 
     return {
         "status": "success",
@@ -324,3 +344,68 @@ def get_subject_topics(subject_code: str, session: Session = Depends(get_session
         .order_by(Topic.topic_number)
     ).all()
     return topics
+
+@app.post("/api/progress/update")
+def update_lesson_progress(data: ProgressUpdate, session: Session = Depends(get_session)):
+    """Record or update a student's progress for a specific lesson topic."""
+    prog = session.exec(select(LessonProgress).where(
+        LessonProgress.student_id == data.student_id,
+        LessonProgress.subject_code == data.subject_code,
+        LessonProgress.topic_number == data.topic_number
+    )).first()
+
+    if not prog:
+        prog = LessonProgress(
+            student_id=data.student_id,
+            subject_code=data.subject_code,
+            topic_number=data.topic_number
+        )
+
+    prog.progress_percent = max(prog.progress_percent, data.progress_percent)
+    if data.completed:
+        prog.completed = True
+    prog.updated_at = datetime.utcnow()
+
+    session.add(prog)
+    session.commit()
+    return {"status": "success"}
+
+@app.get("/api/admin/dashboard/{subject_code}")
+def get_admin_dashboard_data(subject_code: str, session: Session = Depends(get_session)):
+    """Fetch student access times and topic completion percentages for the admin dashboard."""
+    sec_id = f"SEC_{subject_code}_DEFAULT"
+    enrollments = session.exec(select(Enrollment).where(Enrollment.section_id == sec_id)).all()
+    topics = session.exec(select(Topic).where(Topic.subject_code == subject_code).order_by(Topic.topic_number)).all()
+
+    student_data = []
+    for enr in enrollments:
+        student = session.exec(select(Student).where(Student.student_id == enr.student_id)).first()
+        if not student:
+            continue
+
+        progress_records = session.exec(select(LessonProgress).where(
+            LessonProgress.student_id == student.student_id,
+            LessonProgress.subject_code == subject_code
+        )).all()
+
+        prog_map = {p.topic_number: p.progress_percent for p in progress_records}
+
+        student_data.append({
+            "student_id": student.student_id,
+            "name": student.name,
+            "last_login": student.last_login.strftime("%b %d, %Y %I:%M %p") if student.last_login else "Never",
+            "progress": [
+                {
+                    "topic_number": t.topic_number,
+                    "topic_title": t.topic_title,
+                    "percent": prog_map.get(t.topic_number, 0)
+                }
+                for t in topics
+            ]
+        })
+
+    return {
+        "subject_code": subject_code,
+        "topics": [{"topic_number": t.topic_number, "topic_title": t.topic_title} for t in topics],
+        "students": student_data
+    }

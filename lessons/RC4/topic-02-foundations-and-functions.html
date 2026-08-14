@@ -831,6 +831,32 @@ print("A Difference B:", A - B)</pre>
     document.getElementById('mvResult').innerText = `z = f(${x}, ${y}) = ${z}`;
   }
 
+  function sendProgressToBackend(percent, isFinished = false) {
+    // 1. Get student ID from parent shell (index.html)
+    const studentId = window.parent.currentStudentId;
+    if (!studentId) return;
+
+    // 2. Extract subject code automatically from the URL path (e.g., /lessons/BIT04/topic-01-units.html)
+    const pathParts = window.location.pathname.split('/');
+    const subjectCode = pathParts[2] || "BIT04"; 
+
+    // 3. SET THIS FOR EACH LESSON FILE (e.g., 1 for Topic 1, 2 for Topic 2)
+    const topicNum = 1; 
+
+    // 4. Send progress payload to backend
+    fetch('/api/progress/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        student_id: studentId,
+        subject_code: subjectCode,
+        topic_number: topicNum,
+        progress_percent: percent,
+        completed: isFinished
+      })
+    }).catch(err => console.warn("Failed to update progress:", err));
+  }
+
   function finishLesson() {
     document.getElementById('completion').classList.add('visible');
     document.getElementById('python-tutorial').style.display = 'block';

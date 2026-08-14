@@ -28,8 +28,17 @@ class Student(SQLModel, table=True):
     student_id: str = Field(primary_key=True)    # e.g. 2024-00101
     name: str
     email: Optional[str] = None
-
+    last_login: Optional[datetime] = Field(default=None)
     sections: List[Section] = Relationship(back_populates="students", link_model=Enrollment)
+
+class LessonProgress(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    student_id: str = Field(foreign_key="student.student_id")
+    subject_code: str
+    topic_number: int
+    progress_percent: int = Field(default=0)
+    completed: bool = Field(default=False)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
 
 class Topic(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
