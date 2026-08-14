@@ -6,6 +6,7 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from sqlmodel import Session, select
+from sqlalchemy import text  # <-- ADDED for the migration
 from pydantic import BaseModel
 
 from server.database import init_db, get_session, engine
@@ -20,8 +21,21 @@ app.mount("/lessons", StaticFiles(directory="lessons"), name="lessons")
 @app.on_event("startup")
 def on_startup():
     init_db()
+    migrate_db_schema()  # <-- ADDED to run the migration check on startup
     seed_default_courses()
     sync_all_subject_rosters("lessons")
+
+def migrate_db_schema():
+    """Safely alter existing SQLite tables to add new columns if they don't exist yet."""
+    with Session(engine) as session:
+        try:
+            # Check if student table has last_login column; if not, add it!
+            session.exec(text("ALTER TABLE student ADD COLUMN last_login DATETIME;"))
+            session.commit()
+            print("[MIGRATION] Added missing 'last_login' column to 'student' table.")
+        except Exception:
+            # Column already exists, so ignore the exception safely
+            session.rollback()
 
 def seed_default_courses():
     """Ensure Subjects and Topics exist and update file paths in DB on restart."""
